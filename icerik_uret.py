@@ -85,8 +85,8 @@ def konu_sec():
 def icerik_uret(konu):
 
     prompt = f"""
-Du bist ein professioneller Content-Assistent für 
-den Instagram-Account "wiemachtmandasindeutschland" 
+Du bist ein professioneller Content-Assistent für
+den Instagram-Account "wiemachtmandasindeutschland"
 (Wie macht man das in Deutschland).
 
 THEMA:
@@ -103,92 +103,109 @@ Erstelle gleichzeitig:
 Ziel:
 Erstelle hilfreiche, praktische und zuverlässige Inhalte
 für Menschen, die in Deutschland leben oder neu nach Deutschland
-gekommen sind. Der Inhalt soll auf Deutsch sein und einfach
+gekommen sind.
+
+Der gesamte Inhalt muss auf Deutsch sein und einfach
 verständlich sein.
 
 ============================================================
-SEHR WICHTIG: KORREKTHEIT DER INFORMATIONEN
+SEHR WICHTIG: KORREKTHEIT
 ============================================================
 
-- Schreibe keine Informationen als Tatsachen, wenn du dir nicht sicher bist.
+- Schreibe keine Informationen als Tatsachen, wenn du dir
+  nicht sicher bist.
 - Erfinde keine Zahlen.
 - Erfinde keine Geldbeträge.
-- Erfinde keine Gebühren oder Antragskosten.
-- Erfinde keine Daten oder Antragsfristen.
+- Erfinde keine Gebühren.
+- Erfinde keine Fristen.
 - Erfinde keine rechtlichen Bedingungen.
-- Gebe keine sicheren Aussagen zu Gerichten, Aufenthalten,
-  Staatsbürgerschaft, Steuern, Sozialleistungen, Stipendien
-  oder offiziellen Anträgen, wenn du dir nicht sicher bist.
-- Wenn eine Information sich ändern kann, mache das deutlich.
-- Du kannst eine Warnung hinzufügen wie:
-  "Aktuelle Informationen immer bei den zuständigen
-  behörden überprüfen."
-- Verwechsle verschiedene behörden oder Antragsysteme nicht.
-- Erfinde keine URLs oder Namen von behördenwebseiten oder
-  Antragsystemen, wenn du dir nicht sicher bist.
-- Verwende keine Ausdrücke wie "definitiv", "garantiert",
-  "jeder kann" oder ähnliches.
-- Der Inhalt soll hilfreich sein, aber vorsichtig.
+- Bei veränderlichen Informationen deutlich darauf hinweisen.
+- Keine erfundenen URLs.
+- Keine erfundenen Behördennamen.
+- Keine Aussagen wie "garantiert" oder "jeder kann".
+- Bei offiziellen Themen immer empfehlen, die aktuellen
+  Informationen bei der zuständigen Behörde zu prüfen.
 
 ============================================================
 CAROUSEL
 ============================================================
 
-Erstelle 1 Titelfolie + 5 Inhaltsfolien.
+Erstelle genau:
+
+1 Titelfolie + 5 Inhaltsfolien.
 
 Regeln:
 
-- Der Titel auf der Titelfolie soll kurz und auffällig sein.
-- Jede Inhaltsfolie sollte maximal 2 kurze Sätze haben.
-- Verwende einfaches Deutsch.
-- Gebe praktische Informationen.
-- Wähle genau 1 Emoji pro Folie.
+- Titel kurz und auffällig.
+- Jede Inhaltsfolie maximal 2 kurze Sätze.
+- Einfaches Deutsch.
+- Praktische Informationen.
+- Genau 1 Emoji pro Inhaltsfolie.
 
 ============================================================
 REEL
 ============================================================
 
-Erstelle Inhalte für ein 15-20 Sekunden Reel.
+Erstelle ein 15-20 Sekunden Reel.
 
-- 5-6 kurze Szenen.
-- Die erste Szene sollte eine starke, aufmerksamkeitserregende Einleitung sein.
-- Wiederhole das Carousel nicht wort-für-wort.
-- Das Reel sollte schneller und umgangssprachlicher sein.
-- Endet mit einem kurzen Call-to-Action.
-- Jede Szene sollte kurz sein.
+- Genau 6 kurze Szenen.
+- Szene 1 muss Aufmerksamkeit erzeugen.
+- Nicht wortwörtlich das Carousel wiederholen.
+- Schneller und natürlicher Stil.
+- Am Ende kurzer CTA.
 
 ============================================================
 STORY
 ============================================================
 
-Erstelle eine Story.
+Erstelle genau eine kurze interaktive Story.
 
-- Kurz und interaktiv.
-- Enthalte eine Frage.
-- 2 Abstimmungsoptionen.
+Die Story MUSS IMMER enthalten:
+
+- "baslik"
+- "metin"
+- "anket"
+
+"anket" MUSS immer ein Array mit GENAU 2 kurzen
+Antwortmöglichkeiten sein.
+
+Beispiel:
+
+"anket": [
+  "Ja, wusste ich",
+  "Nein, wusste ich nicht"
+]
+
+Wenn das Thema keine konkrete Abstimmung erlaubt,
+verwende trotzdem eine einfache Wissensfrage zum Thema.
 
 ============================================================
 CAPTION
 ============================================================
 
 - 2-4 kurze Sätze.
-- Freundlich und informativ.
-- Endet mit einem kurzen Call-to-Action.
-- Ermutige die Nutzer, zu speichern, zu teilen oder zu kommentieren.
+- Freundlich.
+- Informativ.
+- Kurzer Call-to-Action.
+- Nutzer zum Speichern, Teilen oder Kommentieren motivieren.
 
 ============================================================
 HASHTAGS
 ============================================================
 
-Erstelle maximal 10 relevante Hashtags.
+Maximal 10 relevante Hashtags.
 
 ============================================================
 JSON
 ============================================================
 
-Antworte NUR im folgenden JSON-Format.
+Antworte AUSSCHLIESSLICH mit gültigem JSON.
 
-Schreibe keine Erklärungen außerhalb des JSON.
+Keine Erklärungen.
+Keine Markdown-Codeblöcke.
+Kein Text außerhalb des JSON.
+
+Das JSON MUSS exakt diese Struktur haben:
 
 {{
   "baslik": "Carousel-Titelfolientitel",
@@ -226,10 +243,10 @@ Schreibe keine Erklärungen außerhalb des JSON.
 
   "story": {{
     "baslik": "Story-Titel",
-    "metin": "Story-Frage Text",
+    "metin": "Kurze Frage zum Thema",
     "anket": [
-      "Option 1",
-      "Option 2"
+      "Ja",
+      "Nein"
     ]
   }},
 
@@ -269,6 +286,7 @@ Schreibe keine Erklärungen außerhalb des JSON.
         parcalar = metin.split("```")
 
         if len(parcalar) >= 2:
+
             metin = parcalar[1]
 
             if metin.startswith("json"):
@@ -286,7 +304,9 @@ Schreibe keine Erklärungen außerhalb des JSON.
 
     except json.JSONDecodeError as hata:
 
-        print("AI hat keinen JSON erzeugt oder JSON ist fehlerhaft.")
+        print(
+            "AI hat keinen gültigen JSON erzeugt."
+        )
 
         print()
         print("AI-ANTWORT:")
@@ -295,7 +315,7 @@ Schreibe keine Erklärungen außerhalb des JSON.
         raise hata
 
     # ========================================================
-    # ALAN KONTROLÜ
+    # TEMEL ALAN KONTROLÜ
     # ========================================================
 
     gerekli_alanlar = [
@@ -317,22 +337,192 @@ Schreibe keine Erklärungen außerhalb des JSON.
                 f"'{alan}' Feld in der AI-Ausgabe nicht gefunden."
             )
 
-    # Reel kontrol
+    # ========================================================
+    # CAROUSEL KONTROLÜ
+    # ========================================================
+
+    if not isinstance(
+        icerik["slaytlar"],
+        list
+    ):
+
+        raise ValueError(
+            "'slaytlar' muss eine Liste sein."
+        )
+
+    if len(icerik["slaytlar"]) < 5:
+
+        raise ValueError(
+            "Carousel benötigt mindestens 5 Inhaltsfolien."
+        )
+
+    if not isinstance(
+        icerik["emojiler"],
+        list
+    ):
+
+        raise ValueError(
+            "'emojiler' muss eine Liste sein."
+        )
+
+    if len(icerik["emojiler"]) < 5:
+
+        raise ValueError(
+            "Carousel benötigt mindestens 5 Emojis."
+        )
+
+    # ========================================================
+    # REEL KONTROLÜ
+    # ========================================================
+
+    if not isinstance(
+        icerik["reel"],
+        dict
+    ):
+
+        raise ValueError(
+            "'reel' muss ein Objekt sein."
+        )
+
     if "sahneler" not in icerik["reel"]:
+
         raise ValueError(
             "'sahneler' nicht im Reel-Inhalt gefunden."
         )
 
-    # Story kontrol
-    if "anket" not in icerik["story"]:
+    if not isinstance(
+        icerik["reel"]["sahneler"],
+        list
+    ):
+
         raise ValueError(
-            "'anket' nicht im Story-Inhalt gefunden."
+            "'sahneler' muss eine Liste sein."
         )
 
-    if len(icerik["story"]["anket"]) < 2:
+    if len(icerik["reel"]["sahneler"]) < 5:
+
         raise ValueError(
-            "Story-Abstimmung erfordert mindestens 2 Optionen."
+            "Reel benötigt mindestens 5 Szenen."
         )
+
+    # ========================================================
+    # STORY KONTROLÜ
+    # ========================================================
+
+    if not isinstance(
+        icerik["story"],
+        dict
+    ):
+
+        print(
+            "⚠️ Story-Objekt fehlt oder ist ungültig."
+        )
+
+        icerik["story"] = {
+            "baslik": "Was denkst du?",
+            "metin": f"Kennst du dich mit diesem Thema aus: {konu}?",
+            "anket": [
+                "Ja",
+                "Nein"
+            ]
+        }
+
+    story = icerik["story"]
+
+    # --------------------------------------------------------
+    # Story Titel
+    # --------------------------------------------------------
+
+    if not story.get("baslik"):
+
+        story["baslik"] = (
+            "Wusstest du das?"
+        )
+
+    # --------------------------------------------------------
+    # Story Text
+    # --------------------------------------------------------
+
+    if not story.get("metin"):
+
+        story["metin"] = (
+            f"Kennst du dich mit diesem Thema aus: {konu}?"
+        )
+
+    # --------------------------------------------------------
+    # ANKET
+    # --------------------------------------------------------
+
+    if (
+        "anket" not in story
+        or not isinstance(story["anket"], list)
+        or len(story["anket"]) < 2
+    ):
+
+        print()
+        print(
+            "⚠️ Claude hat keine gültige Story-Umfrage "
+            "erstellt."
+        )
+
+        print(
+            "→ Standard-Umfrage wird automatisch erstellt."
+        )
+
+        story["anket"] = [
+            "Ja, wusste ich",
+            "Nein, wusste ich nicht"
+        ]
+
+    else:
+
+        # Nur die ersten zwei Optionen verwenden
+        story["anket"] = story["anket"][:2]
+
+    # ========================================================
+    # CAPTION KONTROLLE
+    # ========================================================
+
+    if not isinstance(
+        icerik["caption"],
+        str
+    ):
+
+        icerik["caption"] = (
+            f"Interessantes zum Thema {konu}. "
+            "Speichere den Beitrag für später!"
+        )
+
+    # ========================================================
+    # HASHTAGS KONTROLLE
+    # ========================================================
+
+    if not isinstance(
+        icerik["hashtagler"],
+        list
+    ):
+
+        icerik["hashtagler"] = [
+            "#deutschland",
+            "#lebenindeutschland",
+            "#deutschlandtipps"
+        ]
+
+    # Maximal 10 Hashtags
+    icerik["hashtagler"] = (
+        icerik["hashtagler"][:10]
+    )
+
+    # ========================================================
+    # STORY SONDERKONTROLLE
+    # ========================================================
+
+    if len(story["anket"]) != 2:
+
+        story["anket"] = [
+            "Ja",
+            "Nein"
+        ]
 
     return icerik
 
@@ -435,4 +625,5 @@ def main():
 # ============================================================
 
 if __name__ == "__main__":
+
     main()
