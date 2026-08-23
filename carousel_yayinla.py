@@ -2,6 +2,7 @@ import os
 import json
 import time
 import requests
+import subprocess
 
 from pathlib import Path
 from dotenv import load_dotenv
@@ -109,6 +110,93 @@ def github_roh_url_olustur(bild_adı):
     )
 
     return url
+
+
+# ============================================================
+# BILDER ZU GITHUB HOCHLADEN
+# ============================================================
+
+def bilder_github_ye_gonder():
+
+    print(
+        "\nBilder werden zu GitHub hochgeladen..."
+    )
+
+    try:
+
+        subprocess.run(
+            ["git", "fetch", "origin"],
+            check=True
+        )
+
+        subprocess.run(
+            ["git", "add", "gorseller/"],
+            check=True
+        )
+
+        commit_result = subprocess.run(
+
+            [
+                "git",
+                "commit",
+                "-m",
+                "carousel: Deutsche Bilder hochgeladen"
+            ],
+
+            capture_output=True,
+            text=True
+        )
+
+        if commit_result.returncode != 0:
+
+            output = (
+                commit_result.stdout
+                + commit_result.stderr
+            ).lower()
+
+            if "nothing to commit" in output:
+
+                print(
+                    "Keine neuen Bilder zum Commit."
+                )
+
+            else:
+
+                print(
+                    "Git Commit-Warnung:"
+                )
+
+                print(
+                    commit_result.stderr
+                )
+
+        else:
+
+            print(
+                "✓ Bilder committed."
+            )
+
+        subprocess.run(
+            ["git", "push", "origin", "main"],
+            check=True
+        )
+
+        print(
+            "✓ Bilder zu GitHub hochgeladen."
+        )
+
+        # GitHub Verarbeitungszeit
+        print(
+            "Warte 10 Sekunden auf GitHub-Verarbeitung..."
+        )
+
+        time.sleep(10)
+
+    except subprocess.CalledProcessError as error:
+
+        raise RuntimeError(
+            f"GitHub Bilder-Upload fehlgeschlagen: {error}"
+        )
 
 
 # ============================================================
@@ -447,15 +535,26 @@ def main():
         f"{len(bilder)} PNG-Bilder gefunden."
     )
 
+    for i, bild in enumerate(bilder):
+
+        print(
+            f"  {i+1}. {bild.name}"
+        )
+
     # --------------------------------------------------------
-    # 5. GitHub URLs
+    # 5. BILDER ZU GITHUB HOCHLADEN (NEU!)
+    # --------------------------------------------------------
+
+    bilder_github_ye_gonder()
+
+    # --------------------------------------------------------
+    # 6. GitHub URLs
     # --------------------------------------------------------
 
     bild_urls = []
 
     for i, bild in enumerate(bilder):
 
-        # URL mit Datum erstellen
         url = (
             f"https://raw.githubusercontent.com/"
             f"{GITHUB_USERNAME}/"
@@ -467,12 +566,8 @@ def main():
 
         bild_urls.append(url)
 
-        print(
-            f"  {i+1}. {bild.name}"
-        )
-
     # --------------------------------------------------------
-    # 6. Caption & Hashtags
+    # 7. Caption & Hashtags
     # --------------------------------------------------------
 
     caption = icerik.get(
@@ -497,7 +592,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 7. Carousel Container erstellen
+    # 8. Carousel Container erstellen
     # --------------------------------------------------------
 
     container_id = (
@@ -509,7 +604,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 8. Auf Verarbeitung warten
+    # 9. Auf Verarbeitung warten
     # --------------------------------------------------------
 
     container_hazir_olmasini_bekle(
@@ -517,7 +612,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 9. Veröffentlichen
+    # 10. Veröffentlichen
     # --------------------------------------------------------
 
     post_id = carousel_yayinla(
