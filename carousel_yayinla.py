@@ -19,14 +19,51 @@ IG_USER_ID = os.environ["INSTAGRAM_BUSINESS_ACCOUNT_ID"]
 GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
 GITHUB_REPO = os.environ["GITHUB_REPO"]
 
-API_SURUM = "v21.0"
-API_TEMEL = f"https://graph.instagram.com/{API_SURUM}"
+# ============================================================
+# WICHTIG:
+# Facebook Login / Page Access Token kullanıldığı için
+# graph.facebook.com kullanıyoruz.
+# ============================================================
+
+API_VERSION = "v21.0"
+API_BASE = f"https://graph.facebook.com/{API_VERSION}"
 
 CIKTI_KLASOR = Path("cikti")
 GORSEL_KLASOR = Path("gorseller")
 
 KONTROL_ARALIGI = 5
 MAKSIMUM_BEKLEME = 180
+
+
+# ============================================================
+# API HATA YARDIMCISI
+# ============================================================
+
+def api_hatasi_yazdir(yanit, islem):
+
+    print()
+    print("=" * 60)
+    print(f"❌ API HATASI: {islem}")
+    print("=" * 60)
+
+    print(f"HTTP Status: {yanit.status_code}")
+
+    try:
+        hata = yanit.json()
+
+        print(
+            json.dumps(
+                hata,
+                ensure_ascii=False,
+                indent=2
+            )
+        )
+
+    except Exception:
+
+        print(yanit.text)
+
+    print("=" * 60)
 
 
 # ============================================================
@@ -93,6 +130,46 @@ def github_raw_url(dosya_yolu):
 
 
 # ============================================================
+# TOKEN KONTROLÜ
+# ============================================================
+
+def token_kontrol():
+
+    print()
+    print("Instagram API bağlantısı kontrol ediliyor...")
+
+    yanit = requests.get(
+
+        f"{API_BASE}/{IG_USER_ID}",
+
+        params={
+            "fields": "id,username",
+            "access_token": ACCESS_TOKEN,
+        },
+
+        timeout=30
+    )
+
+    if not yanit.ok:
+
+        api_hatasi_yazdir(
+            yanit,
+            "Instagram Business Account kontrolü"
+        )
+
+        yanit.raise_for_status()
+
+    veri = yanit.json()
+
+    print()
+    print("✓ Instagram hesabı API tarafından bulundu.")
+    print(f"Instagram ID: {veri.get('id')}")
+    print(f"Instagram Username: @{veri.get('username')}")
+
+    return veri
+
+
+# ============================================================
 # CONTAINER STATUS
 # ============================================================
 
@@ -100,7 +177,7 @@ def container_durumu(container_id):
 
     yanit = requests.get(
 
-        f"{API_TEMEL}/{container_id}",
+        f"{API_BASE}/{container_id}",
 
         params={
             "fields": "status_code,status",
@@ -112,12 +189,9 @@ def container_durumu(container_id):
 
     if not yanit.ok:
 
-        print(
-            "Container-Statusprüfung fehlgeschlagen:"
-        )
-
-        print(
-            yanit.text
+        api_hatasi_yazdir(
+            yanit,
+            "Container Status"
         )
 
         yanit.raise_for_status()
@@ -196,7 +270,8 @@ def container_bekle(container_id):
 
             raise TimeoutError(
                 f"Container war nicht innerhalb von "
-                f"{MAKSIMUM_BEKLEME} Sekunden bereit: {container_id}"
+                f"{MAKSIMUM_BEKLEME} Sekunden bereit: "
+                f"{container_id}"
             )
 
         time.sleep(
@@ -205,7 +280,7 @@ def container_bekle(container_id):
 
 
 # ============================================================
-# CHILD CONTAINER (Für jedes Bild)
+# CHILD CONTAINER
 # ============================================================
 
 def child_container_olustur(gorsel_url):
@@ -221,7 +296,7 @@ def child_container_olustur(gorsel_url):
 
     yanit = requests.post(
 
-        f"{API_TEMEL}/{IG_USER_ID}/media",
+        f"{API_BASE}/{IG_USER_ID}/media",
 
         data={
             "image_url": gorsel_url,
@@ -234,20 +309,25 @@ def child_container_olustur(gorsel_url):
 
     if not yanit.ok:
 
-        print()
-        print(
-            "❌ Child-Container konnte nicht erstellt werden:"
-        )
-
-        print(
-            yanit.text
+        api_hatasi_yazdir(
+            yanit,
+            "Child-Container erstellen"
         )
 
         yanit.raise_for_status()
 
-    container_id = (
-        yanit.json()["id"]
+    veri = yanit.json()
+
+    container_id = veri.get(
+        "id"
     )
+
+    if not container_id:
+
+        raise RuntimeError(
+            f"Instagram hat keine Container-ID zurückgegeben: "
+            f"{veri}"
+        )
 
     print(
         f"✓ Child-Container: {container_id}"
@@ -257,7 +337,7 @@ def child_container_olustur(gorsel_url):
 
 
 # ============================================================
-# CAROUSEL CONTAINER (Alle Bilder kombiniert)
+# CAROUSEL CONTAINER
 # ============================================================
 
 def carousel_container_olustur(
@@ -272,7 +352,7 @@ def carousel_container_olustur(
 
     yanit = requests.post(
 
-        f"{API_TEMEL}/{IG_USER_ID}/media",
+        f"{API_BASE}/{IG_USER_ID}/media",
 
         data={
             "media_type": "CAROUSEL",
@@ -286,20 +366,25 @@ def carousel_container_olustur(
 
     if not yanit.ok:
 
-        print()
-        print(
-            "❌ Carousel-Container konnte nicht erstellt werden:"
-        )
-
-        print(
-            yanit.text
+        api_hatasi_yazdir(
+            yanit,
+            "Carousel-Container erstellen"
         )
 
         yanit.raise_for_status()
 
-    container_id = (
-        yanit.json()["id"]
+    veri = yanit.json()
+
+    container_id = veri.get(
+        "id"
     )
+
+    if not container_id:
+
+        raise RuntimeError(
+            f"Instagram hat keine Carousel-ID zurückgegeben: "
+            f"{veri}"
+        )
 
     print(
         f"✓ Carousel-Container: {container_id}"
@@ -318,6 +403,12 @@ def carousel_yayinla():
     print("=" * 60)
     print("DEUTSCHES INSTAGRAM CAROUSEL")
     print("=" * 60)
+
+    # --------------------------------------------------------
+    # 0. API / TOKEN TEST
+    # --------------------------------------------------------
+
+    token_kontrol()
 
     # --------------------------------------------------------
     # 1. Inhaltsdatei
@@ -378,7 +469,8 @@ def carousel_yayinla():
     if not png_dosyalari:
 
         raise FileNotFoundError(
-            f"Keine PNG-Dateien in {gorsel_klasoru} gefunden."
+            f"Keine PNG-Dateien in "
+            f"{gorsel_klasoru} gefunden."
         )
 
     print()
@@ -386,8 +478,16 @@ def carousel_yayinla():
         f"{len(png_dosyalari)} Bilder gefunden."
     )
 
+    # Instagram Carousel maksimum 10 öğe
+    if len(png_dosyalari) > 10:
+
+        raise ValueError(
+            f"Instagram Carousel unterstützt maximal "
+            f"10 Elemente. Gefunden: {len(png_dosyalari)}"
+        )
+
     # --------------------------------------------------------
-    # 5. CHILD CONTAINERS für jedes Bild
+    # 5. CHILD CONTAINERS
     # --------------------------------------------------------
 
     child_ids = []
@@ -399,13 +499,22 @@ def carousel_yayinla():
 
         print()
         print(
-            f"[{sira}/{len(png_dosyalari)}]"
+            f"[{sira}/{len(png_dosyalari)}"
+            f"]"
         )
 
-        # Pfad
-        gorsel_yolu = png_dosyasi.as_posix()
+        # ----------------------------------------------------
+        # Lokaler Pfad
+        # ----------------------------------------------------
 
-        # GitHub URL
+        gorsel_yolu = (
+            png_dosyasi.as_posix()
+        )
+
+        # ----------------------------------------------------
+        # GitHub Raw URL
+        # ----------------------------------------------------
+
         gorsel_url = github_raw_url(
             Path(gorsel_yolu)
         )
@@ -414,14 +523,20 @@ def carousel_yayinla():
             f"URL: {gorsel_url}"
         )
 
+        # ----------------------------------------------------
         # Child Container erstellen
+        # ----------------------------------------------------
+
         child_id = (
             child_container_olustur(
                 gorsel_url
             )
         )
 
-        # Auf Verarbeitung warten
+        # ----------------------------------------------------
+        # Verarbeitung abwarten
+        # ----------------------------------------------------
+
         container_bekle(
             child_id
         )
@@ -453,7 +568,7 @@ def carousel_yayinla():
         )
 
     # --------------------------------------------------------
-    # 7. CAROUSEL CONTAINER erstellen
+    # 7. CAROUSEL CONTAINER
     # --------------------------------------------------------
 
     carousel_id = (
@@ -464,7 +579,7 @@ def carousel_yayinla():
     )
 
     # --------------------------------------------------------
-    # 8. Auf Carousel-Verarbeitung warten
+    # 8. CAROUSEL VERARBEITUNG ABWARTEN
     # --------------------------------------------------------
 
     container_bekle(
@@ -472,7 +587,7 @@ def carousel_yayinla():
     )
 
     # --------------------------------------------------------
-    # 9. Veröffentlichen
+    # 9. VERÖFFENTLICHEN
     # --------------------------------------------------------
 
     print()
@@ -482,7 +597,7 @@ def carousel_yayinla():
 
     yanit = requests.post(
 
-        f"{API_TEMEL}/{IG_USER_ID}/media_publish",
+        f"{API_BASE}/{IG_USER_ID}/media_publish",
 
         data={
             "creation_id": carousel_id,
@@ -494,13 +609,9 @@ def carousel_yayinla():
 
     if not yanit.ok:
 
-        print()
-        print(
-            "❌ CAROUSEL KONNTE NICHT VERÖFFENTLICHT WERDEN"
-        )
-
-        print(
-            yanit.text
+        api_hatasi_yazdir(
+            yanit,
+            "Carousel veröffentlichen"
         )
 
         yanit.raise_for_status()
@@ -509,13 +620,17 @@ def carousel_yayinla():
     # 10. ERFOLG
     # --------------------------------------------------------
 
-    post_id = (
-        yanit.json().get("id")
+    veri = yanit.json()
+
+    post_id = veri.get(
+        "id"
     )
 
     print()
     print("=" * 60)
-    print("✓ DEUTSCHES CAROUSEL ERFOLGREICH VERÖFFENTLICHT!")
+    print(
+        "✓ DEUTSCHES CAROUSEL ERFOLGREICH VERÖFFENTLICHT!"
+    )
     print("=" * 60)
 
     print()
