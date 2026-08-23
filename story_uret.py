@@ -4,19 +4,19 @@ from playwright.sync_api import sync_playwright
 
 
 # ============================================================
-# KLASÖRLER
+# KLASSEUR
 # ============================================================
 
 CIKTI_KLASOR = Path("cikti")
 STORY_KLASOR = Path("stories")
 
-# Instagram Story ölçüsü
+# Instagram Story Größe
 GENISLIK = 1080
 YUKSEKLIK = 1920
 
 
 # ============================================================
-# STORY HTML TASARIMI
+# STORY HTML DESIGN
 # ============================================================
 
 STORY_HTML = """
@@ -58,7 +58,7 @@ body {{
 
 
 /* ========================================================
-   ÜST ALMAN BAYRAĞI ŞERİDİ
+   DEUTSCHES FLAGGENBAND OBEN
    ======================================================== */
 
 .ust-serit {{
@@ -90,7 +90,7 @@ body {{
 
 
 /* ========================================================
-   ALT ALMAN BAYRAĞI ŞERİDİ
+   DEUTSCHES FLAGGENBAND UNTEN
    ======================================================== */
 
 .alt-serit {{
@@ -122,7 +122,7 @@ body {{
 
 
 /* ========================================================
-   ÜST BAŞLIK
+   OBERE ÜBERSCHRIFT
    ======================================================== */
 
 .logo {{
@@ -145,7 +145,7 @@ body {{
 
 
 /* ========================================================
-   STORY İKONU
+   STORY ICON
    ======================================================== */
 
 .ikon {{
@@ -163,7 +163,7 @@ body {{
 
 
 /* ========================================================
-   BAŞLIK
+   TITEL
    ======================================================== */
 
 .baslik {{
@@ -187,7 +187,7 @@ body {{
 
 
 /* ========================================================
-   SORU KUTUSU
+   FRAGE BOX
    ======================================================== */
 
 .soru-kutusu {{
@@ -222,7 +222,7 @@ body {{
 
 
 /* ========================================================
-   ANKET
+   ABSTIMMUNG
    ======================================================== */
 
 .anket {{
@@ -313,7 +313,7 @@ body {{
 <body>
 
 
-<!-- ÜST ŞERİT -->
+<!-- OBERES BAND -->
 
 <div class="ust-serit">
 
@@ -326,7 +326,7 @@ body {{
 </div>
 
 
-<!-- ALT ŞERİT -->
+<!-- UNTERES BAND -->
 
 <div class="alt-serit">
 
@@ -339,16 +339,16 @@ body {{
 </div>
 
 
-<!-- HESAP ADI -->
+<!-- KONTONAME -->
 
 <div class="logo">
 
-    ALMANYA'DA NASIL YAPILIR?
+    WIE MACHT MAN DAS IN DEUTSCHLAND?
 
 </div>
 
 
-<!-- İKON -->
+<!-- ICON -->
 
 <div class="ikon">
 
@@ -357,7 +357,7 @@ body {{
 </div>
 
 
-<!-- STORY BAŞLIĞI -->
+<!-- STORY TITEL -->
 
 <div class="baslik">
 
@@ -366,7 +366,7 @@ body {{
 </div>
 
 
-<!-- SORU -->
+<!-- FRAGE -->
 
 <div class="soru-kutusu">
 
@@ -379,7 +379,7 @@ body {{
 </div>
 
 
-<!-- ANKET -->
+<!-- ABSTIMMUNG -->
 
 <div class="anket">
 
@@ -402,9 +402,9 @@ body {{
 
 <div class="cta">
 
-    <span>Oyunu kullan 👆</span><br>
+    <span>Nutze die Abstimmung 👆</span><br>
 
-    Senin cevabın hangisi?
+    Was ist deine Antwort?
 
 </div>
 
@@ -416,7 +416,7 @@ body {{
 
 
 # ============================================================
-# EN SON İÇERİK DOSYASINI BUL
+# LETZTEN INHALT FINDE
 # ============================================================
 
 def son_icerik_dosyasi():
@@ -428,21 +428,21 @@ def son_icerik_dosyasi():
     if not dosyalar:
 
         raise FileNotFoundError(
-            "cikti/ klasöründe içerik dosyası bulunamadı. "
-            "Önce icerik_uret.py çalıştır."
+            "Keine Inhaltsdatei in cikti/ gefunden. "
+            "Führe zuerst icerik_uret.py aus."
         )
 
     return dosyalar[-1]
 
 
 # ============================================================
-# STORY ÜRET
+# STORY ERSTELLEN
 # ============================================================
 
 def story_uret(icerik_dosyasi: Path):
 
     # --------------------------------------------------------
-    # JSON oku
+    # JSON lesen
     # --------------------------------------------------------
 
     icerik = json.loads(
@@ -452,19 +452,19 @@ def story_uret(icerik_dosyasi: Path):
     )
 
     # --------------------------------------------------------
-    # Story kontrolü
+    # Story-Prüfung
     # --------------------------------------------------------
 
     if "story" not in icerik:
 
         raise ValueError(
-            "JSON içerisinde 'story' bölümü bulunamadı."
+            "'story' Bereich im JSON nicht gefunden."
         )
 
     story = icerik["story"]
 
     # --------------------------------------------------------
-    # Tarih
+    # Datum
     # --------------------------------------------------------
 
     tarih = icerik.get(
@@ -473,7 +473,7 @@ def story_uret(icerik_dosyasi: Path):
     )
 
     # --------------------------------------------------------
-    # Story klasörü
+    # Story-Klasseur
     # --------------------------------------------------------
 
     hedef_klasor = (
@@ -487,17 +487,17 @@ def story_uret(icerik_dosyasi: Path):
     )
 
     # --------------------------------------------------------
-    # Story bilgileri
+    # Story-Informationen
     # --------------------------------------------------------
 
     baslik = story.get(
         "baslik",
-        "Sen ne düşünüyorsun?"
+        "Was denkst du?"
     )
 
     metin = story.get(
         "metin",
-        "Bu konu hakkında ne düşünüyorsun?"
+        "Was denkst du zu diesem Thema?"
     )
 
     anket = story.get(
@@ -506,21 +506,21 @@ def story_uret(icerik_dosyasi: Path):
     )
 
     # --------------------------------------------------------
-    # Anket kontrolü
+    # Abstimmungsprüfung
     # --------------------------------------------------------
 
     if len(anket) < 2:
 
         anket = [
-            "Evet 👍",
-            "Hayır 👎"
+            "Ja 👍",
+            "Nein 👎"
         ]
 
     secenek1 = anket[0]
     secenek2 = anket[1]
 
     # --------------------------------------------------------
-    # HTML oluştur
+    # HTML erstellen
     # --------------------------------------------------------
 
     html = STORY_HTML.format(
@@ -543,7 +543,7 @@ def story_uret(icerik_dosyasi: Path):
     # --------------------------------------------------------
 
     print(
-        "\nInstagram Story oluşturuluyor..."
+        "\nInstagram Story wird erstellt..."
     )
 
     with sync_playwright() as p:
@@ -560,13 +560,13 @@ def story_uret(icerik_dosyasi: Path):
             device_scale_factor=1
         )
 
-        # HTML yükle
+        # HTML laden
         sayfa.set_content(
             html,
             wait_until="networkidle"
         )
 
-        # Fontların yüklenmesi için bekle
+        # Auf Schriftarten warten
         sayfa.wait_for_timeout(
             1000
         )
@@ -590,18 +590,18 @@ def story_uret(icerik_dosyasi: Path):
         tarayici.close()
 
     # --------------------------------------------------------
-    # Sonuç
+    # Ergebnis
     # --------------------------------------------------------
 
     print(
-        f"✓ Story oluşturuldu: {story_yolu}"
+        f"✓ Story erstellt: {story_yolu}"
     )
 
     return story_yolu
 
 
 # ============================================================
-# MAIN
+# HAUPTPROGRAMM
 # ============================================================
 
 def main():
@@ -611,22 +611,22 @@ def main():
     )
 
     print(
-        "INSTAGRAM STORY ÜRETİCİ"
+        "INSTAGRAM STORY-GENERATOR"
     )
 
     print(
         "========================================"
     )
 
-    # Son JSON
+    # Letzten JSON
     icerik_dosyasi = son_icerik_dosyasi()
 
     print(
-        f"\nKullanılan içerik:"
+        f"\nVerwendeter Inhalt:"
         f"\n{icerik_dosyasi}"
     )
 
-    # Story üret
+    # Story erstellen
     story_yolu = story_uret(
         icerik_dosyasi
     )
@@ -636,7 +636,7 @@ def main():
     )
 
     print(
-        "✓ STORY BAŞARIYLA OLUŞTURULDU"
+        "✓ STORY ERFOLGREICH ERSTELLT"
     )
 
     print(
@@ -644,13 +644,13 @@ def main():
     )
 
     print(
-        f"\nDosya:"
+        f"\nDatei:"
         f"\n{story_yolu}"
     )
 
 
 # ============================================================
-# ÇALIŞTIR
+# AUSFÜHREN
 # ============================================================
 
 if __name__ == "__main__":

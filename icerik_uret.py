@@ -85,122 +85,122 @@ def konu_sec():
 def icerik_uret(konu):
 
     prompt = f"""
-Sen "Almanya'da Nasıl Yapılır" adlı Instagram hesabı için
-Türkçe içerik üreten profesyonel bir içerik asistanısın.
+Du bist ein professioneller Content-Assistent für 
+den Instagram-Account "wiemachtmandasindeutschland" 
+(Wie macht man das in Deutschland).
 
-KONU:
+THEMA:
 "{konu}"
 
-Bu konu hakkında aynı anda:
+Erstelle gleichzeitig:
 
 1. Instagram Carousel
 2. Instagram Reel
 3. Instagram Story
-4. Instagram caption
-5. Hashtagler
+4. Instagram Caption
+5. Hashtags
 
-oluştur.
-
-Amaç:
-Almanya'da yaşayan veya Almanya'ya yeni gelen
-Türkçe konuşan insanların işine yarayan,
-sade, pratik ve güvenilir içerikler hazırlamak.
+Ziel:
+Erstelle hilfreiche, praktische und zuverlässige Inhalte
+für Menschen, die in Deutschland leben oder neu nach Deutschland
+gekommen sind. Der Inhalt soll auf Deutsch sein und einfach
+verständlich sein.
 
 ============================================================
-ÇOK ÖNEMLİ: BİLGİ DOĞRULUĞU
+SEHR WICHTIG: KORREKTHEIT DER INFORMATIONEN
 ============================================================
 
-- Bilmediğin bilgiyi kesin gerçek olarak yazma.
-- Rakam uydurma.
-- Para miktarı uydurma.
-- Başvuru ücreti uydurma.
-- Tarih veya son başvuru tarihi uydurma.
-- Yasal şartları uydurma.
-- Mahkeme, oturum, vatandaşlık, vergi, sosyal yardım,
-  burs veya resmi başvurular hakkında emin olmadığın
-  bilgileri kesin ifadelerle verme.
-- Bir bilgi değişebilir nitelikteyse bunu açıkça belirt.
-- "Güncel bilgiyi ilgili resmi kurumdan kontrol edin"
-  şeklinde uyarı ekleyebilirsin.
-- Farklı resmi kurumları veya başvuru sistemlerini birbirine
-  karıştırma.
-- Resmi bir internet sitesi veya başvuru sistemi hakkında
-  emin değilsen URL veya sistem adı uydurma.
-- "Kesinlikle", "garanti", "herkes alabilir" gibi ifadeler
-  kullanma.
-- İçerik faydalı fakat temkinli olmalı.
+- Schreibe keine Informationen als Tatsachen, wenn du dir nicht sicher bist.
+- Erfinde keine Zahlen.
+- Erfinde keine Geldbeträge.
+- Erfinde keine Gebühren oder Antragskosten.
+- Erfinde keine Daten oder Antragsfristen.
+- Erfinde keine rechtlichen Bedingungen.
+- Gebe keine sicheren Aussagen zu Gerichten, Aufenthalten,
+  Staatsbürgerschaft, Steuern, Sozialleistungen, Stipendien
+  oder offiziellen Anträgen, wenn du dir nicht sicher bist.
+- Wenn eine Information sich ändern kann, mache das deutlich.
+- Du kannst eine Warnung hinzufügen wie:
+  "Aktuelle Informationen immer bei den zuständigen
+  behörden überprüfen."
+- Verwechsle verschiedene behörden oder Antragsysteme nicht.
+- Erfinde keine URLs oder Namen von behördenwebseiten oder
+  Antragsystemen, wenn du dir nicht sicher bist.
+- Verwende keine Ausdrücke wie "definitiv", "garantiert",
+  "jeder kann" oder ähnliches.
+- Der Inhalt soll hilfreich sein, aber vorsichtig.
 
 ============================================================
 CAROUSEL
 ============================================================
 
-1 kapak + 5 içerik slaytı oluştur.
+Erstelle 1 Titelfolie + 5 Inhaltsfolien.
 
-Kurallar:
+Regeln:
 
-- Kapak başlığı kısa ve dikkat çekici olsun.
-- Her içerik slaytı maksimum 2 kısa cümle olsun.
-- Sade Türkçe kullan.
-- Pratik bilgi ver.
-- Her slayt için TEK emoji seç.
+- Der Titel auf der Titelfolie soll kurz und auffällig sein.
+- Jede Inhaltsfolie sollte maximal 2 kurze Sätze haben.
+- Verwende einfaches Deutsch.
+- Gebe praktische Informationen.
+- Wähle genau 1 Emoji pro Folie.
 
 ============================================================
 REEL
 ============================================================
 
-15-20 saniyelik Reel için içerik oluştur.
+Erstelle Inhalte für ein 15-20 Sekunden Reel.
 
-- 5-6 kısa sahne.
-- İlk sahne güçlü bir dikkat çekici giriş olsun.
-- Carousel'in aynısını kelimesi kelimesine tekrar etme.
-- Reel daha hızlı ve konuşma diline yakın olsun.
-- Sonunda kısa CTA olsun.
-- Her sahne kısa olsun.
+- 5-6 kurze Szenen.
+- Die erste Szene sollte eine starke, aufmerksamkeitserregende Einleitung sein.
+- Wiederhole das Carousel nicht wort-für-wort.
+- Das Reel sollte schneller und umgangssprachlicher sein.
+- Endet mit einem kurzen Call-to-Action.
+- Jede Szene sollte kurz sein.
 
 ============================================================
 STORY
 ============================================================
 
-Tek bir Story oluştur.
+Erstelle eine Story.
 
-- Kısa ve etkileşimli olsun.
-- Soru içersin.
-- 2 anket seçeneği olsun.
+- Kurz und interaktiv.
+- Enthalte eine Frage.
+- 2 Abstimmungsoptionen.
 
 ============================================================
 CAPTION
 ============================================================
 
-- 2-4 kısa cümle.
-- Samimi ve bilgilendirici.
-- Sonunda kısa CTA.
-- Kullanıcıyı kaydetmeye, paylaşmaya veya yorum yapmaya teşvik et.
+- 2-4 kurze Sätze.
+- Freundlich und informativ.
+- Endet mit einem kurzen Call-to-Action.
+- Ermutige die Nutzer, zu speichern, zu teilen oder zu kommentieren.
 
 ============================================================
-HASHTAG
+HASHTAGS
 ============================================================
 
-Maksimum 10 tane alakalı hashtag üret.
+Erstelle maximal 10 relevante Hashtags.
 
 ============================================================
 JSON
 ============================================================
 
-SADECE aşağıdaki JSON formatında cevap ver.
+Antworte NUR im folgenden JSON-Format.
 
-JSON dışında hiçbir açıklama yazma.
+Schreibe keine Erklärungen außerhalb des JSON.
 
 {{
-  "baslik": "Carousel kapak başlığı",
+  "baslik": "Carousel-Titelfolientitel",
 
   "kapak_emoji": "🇩🇪",
 
   "slaytlar": [
-    "Slayt 1 metni",
-    "Slayt 2 metni",
-    "Slayt 3 metni",
-    "Slayt 4 metni",
-    "Slayt 5 metni"
+    "Folie 1 Text",
+    "Folie 2 Text",
+    "Folie 3 Text",
+    "Folie 4 Text",
+    "Folie 5 Text"
   ],
 
   "emojiler": [
@@ -212,39 +212,39 @@ JSON dışında hiçbir açıklama yazma.
   ],
 
   "reel": {{
-    "baslik": "Reel başlığı",
+    "baslik": "Reel-Titel",
     "sahneler": [
-      "Sahne 1",
-      "Sahne 2",
-      "Sahne 3",
-      "Sahne 4",
-      "Sahne 5",
-      "Sahne 6"
+      "Szene 1",
+      "Szene 2",
+      "Szene 3",
+      "Szene 4",
+      "Szene 5",
+      "Szene 6"
     ],
-    "cta": "Reel CTA metni"
+    "cta": "Reel Call-to-Action Text"
   }},
 
   "story": {{
-    "baslik": "Story başlığı",
-    "metin": "Story soru metni",
+    "baslik": "Story-Titel",
+    "metin": "Story-Frage Text",
     "anket": [
-      "Seçenek 1",
-      "Seçenek 2"
+      "Option 1",
+      "Option 2"
     ]
   }},
 
-  "caption": "Instagram açıklama metni",
+  "caption": "Instagram Caption Text",
 
   "hashtagler": [
-    "#almanya",
-    "#almanyadayasam",
-    "#almanyadanasilyapilir"
+    "#deutschland",
+    "#wiemachtman",
+    "#deutschlandtipp"
   ]
 }}
 """
 
     print(
-        "Claude ile Carousel + Reel + Story içeriği oluşturuluyor..."
+        "Claude erstellt Carousel + Reel + Story Inhalte..."
     )
 
     yanit = client.messages.create(
@@ -286,10 +286,10 @@ JSON dışında hiçbir açıklama yazma.
 
     except json.JSONDecodeError as hata:
 
-        print("AI JSON üretmedi veya JSON bozuk.")
+        print("AI hat keinen JSON erzeugt oder JSON ist fehlerhaft.")
 
         print()
-        print("AI CEVABI:")
+        print("AI-ANTWORT:")
         print(metin)
 
         raise hata
@@ -314,24 +314,24 @@ JSON dışında hiçbir açıklama yazma.
         if alan not in icerik:
 
             raise ValueError(
-                f"AI çıktısında '{alan}' alanı bulunamadı."
+                f"'{alan}' Feld in der AI-Ausgabe nicht gefunden."
             )
 
     # Reel kontrol
     if "sahneler" not in icerik["reel"]:
         raise ValueError(
-            "Reel içeriğinde 'sahneler' bulunamadı."
+            "'sahneler' nicht im Reel-Inhalt gefunden."
         )
 
     # Story kontrol
     if "anket" not in icerik["story"]:
         raise ValueError(
-            "Story içeriğinde 'anket' bulunamadı."
+            "'anket' nicht im Story-Inhalt gefunden."
         )
 
     if len(icerik["story"]["anket"]) < 2:
         raise ValueError(
-            "Story anketinde en az 2 seçenek gerekli."
+            "Story-Abstimmung erfordert mindestens 2 Optionen."
         )
 
     return icerik
@@ -349,8 +349,8 @@ def main():
 
     print()
     print("=" * 60)
-    print("ALMANYA'DA NASIL YAPILIR?")
-    print("GÜNLÜK İÇERİK ÜRETİMİ")
+    print("WIE MACHT MAN DAS IN DEUTSCHLAND?")
+    print("TÄGLICHE INHALTSERSTELLUNG")
     print("=" * 60)
     print()
 
@@ -361,7 +361,7 @@ def main():
     konu = konu_sec()
 
     print(
-        f"Seçilen konu: {konu}"
+        f"Gewähltes Thema: {konu}"
     )
 
     # --------------------------------------------------------
@@ -406,7 +406,7 @@ def main():
 
     print()
     print("=" * 60)
-    print("✓ İÇERİK BAŞARIYLA ÜRETİLDİ")
+    print("✓ INHALTE ERFOLGREICH ERSTELLT")
     print("=" * 60)
     print()
 
@@ -415,7 +415,7 @@ def main():
     )
 
     print()
-    print("Üretilen içerikler:")
+    print("Erstellte Inhalte:")
     print("✓ 1 Carousel")
     print("✓ 1 Reel")
     print("✓ 1 Story")

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 
 # ============================================================
-# AYARLAR
+# EINSTELLUNGEN
 # ============================================================
 
 load_dotenv()
@@ -30,7 +30,7 @@ MAKSIMUM_BEKLEME = 180
 
 
 # ============================================================
-# SON İÇERİK DOSYASINI BUL
+# LETZTE INHALTSDATEI FINDEN
 # ============================================================
 
 def son_icerik_dosyasi():
@@ -42,14 +42,14 @@ def son_icerik_dosyasi():
     if not dosyalar:
 
         raise FileNotFoundError(
-            "cikti/ klasöründe icerik_*.json bulunamadı."
+            "Keine icerik_*.json in cikti/ gefunden."
         )
 
     return dosyalar[-1]
 
 
 # ============================================================
-# İÇERİĞE AİT GÖRSEL KLASÖRÜNÜ BUL
+# BILDORDNER FÜR DIESEN INHALT FINDEN
 # ============================================================
 
 def gorsel_klasoru_bul(tarih):
@@ -61,14 +61,14 @@ def gorsel_klasoru_bul(tarih):
     if not hedef_klasor.exists():
 
         raise FileNotFoundError(
-            f"Bu içeriğe ait görsel klasörü bulunamadı: "
+            f"Bildordner für Inhalt nicht gefunden: "
             f"{hedef_klasor}"
         )
 
     if not hedef_klasor.is_dir():
 
         raise NotADirectoryError(
-            f"Görsel yolu klasör değil: "
+            f"Bildpfad ist kein Ordner: "
             f"{hedef_klasor}"
         )
 
@@ -76,44 +76,96 @@ def gorsel_klasoru_bul(tarih):
 
 
 # ============================================================
-# GITHUB RAW URL
+# ALLE BILDER FÜR CAROUSEL
 # ============================================================
 
-def github_raw_url(dosya_yolu):
+def bilder_liste(gorsel_klasoru):
 
-    relative_path = dosya_yolu.as_posix()
+    bilder = sorted(
+        gorsel_klasoru.glob("*.png")
+    )
 
-    return (
+    if not bilder:
+
+        raise FileNotFoundError(
+            f"Keine PNG-Bilder in {gorsel_klasoru} gefunden."
+        )
+
+    return bilder
+
+
+# ============================================================
+# BILDER-URLS VON GITHUB
+# ============================================================
+
+def github_roh_url_olustur(bild_adı):
+
+    url = (
         f"https://raw.githubusercontent.com/"
         f"{GITHUB_USERNAME}/"
         f"{GITHUB_REPO}/"
-        f"main/"
-        f"{relative_path}"
+        f"main/gorseller/"
+        f"{bild_adı}"
     )
 
+    return url
+
 
 # ============================================================
-# CONTAINER DURUMU
+# MEDIA CONTAINER OLUŞTUR (CAROUSEL)
 # ============================================================
 
-def container_durumu(container_id):
+def media_container_olustur(bild_urls, caption, hashtags):
 
-    yanit = requests.get(
+    print(
+        "\nInstagram Carousel Container wird erstellt..."
+    )
 
-        f"{API_TEMEL}/{container_id}",
+    if not bild_urls:
 
-        params={
-            "fields": "status_code,status",
-            "access_token": ACCESS_TOKEN,
-        },
+        raise ValueError(
+            "Keine Bild-URLs vorhanden."
+        )
 
-        timeout=30
+    # --------------------------------------------------------
+    # Einzelne Items für jedes Bild
+    # --------------------------------------------------------
+
+    items = []
+
+    for i, bild_url in enumerate(bild_urls):
+
+        item = {
+            "media_type": "IMAGE",
+            "image_url": bild_url,
+        }
+
+        items.append(item)
+
+    # --------------------------------------------------------
+    # Carousel-Container erstellen
+    # --------------------------------------------------------
+
+    container_daten = {
+        "media_type": "CAROUSEL",
+        "children": items,
+        "caption": caption,
+        "access_token": ACCESS_TOKEN,
+    }
+
+    yanit = requests.post(
+
+        f"{API_TEMEL}/{IG_USER_ID}/media",
+
+        data=container_daten,
+
+        timeout=60
     )
 
     if not yanit.ok:
 
         print(
-            "Container durum kontrolü başarısız:"
+            "❌ FEHLER - Carousel Container konnte nicht erstellt werden:"
         )
 
         print(
@@ -122,82 +174,144 @@ def container_durumu(container_id):
 
         yanit.raise_for_status()
 
-    veri = yanit.json()
+    container_id = yanit.json()["id"]
 
-    return veri
-
-
-# ============================================================
-# CONTAINER HAZIR OLANA KADAR BEKLE
-# ============================================================
-
-def container_bekle(container_id):
-
-    print()
     print(
-        f"Container hazırlanıyor: {container_id}"
+        f"✓ Carousel Container erstellt: {container_id}"
     )
 
-    baslangic = time.time()
+    return container_id
 
-    while True:
 
-        durum = container_durumu(
-            container_id
+# ============================================================
+# CONTAINER STATUS PRÜFEN
+# ============================================================
+
+def container_status_prufen(container_id):
+
+    try:
+
+        yanit = requests.get(
+
+            f"{API_TEMEL}/{container_id}",
+
+            params={
+                "fields": "status_code,status",
+                "access_token": ACCESS_TOKEN,
+            },
+
+            timeout=30
         )
 
-        status_code = durum.get(
+        if not yanit.ok:
+
+            print(
+                "Container-Statusprüfung fehlgeschlagen:"
+            )
+
+            print(
+                yanit.text
+            )
+
+            return None
+
+        daten = yanit.json()
+
+        status_code = daten.get(
             "status_code"
         )
 
-        status = durum.get(
+        status = daten.get(
             "status"
         )
 
         print(
-            f"Durum: {status_code or status}"
+            f"Container Status: "
+            f"{status_code or status}"
         )
 
-        # ----------------------------------------------------
-        # Hazır
-        # ----------------------------------------------------
+        return status_code or status
 
-        if status_code == "FINISHED":
+    except requests.RequestException as hata:
 
-            print(
-                "✓ Container hazır."
-            )
+        print(
+            f"Fehler bei Statusprüfung: {hata}"
+        )
 
-            return True
+        return None
 
-        # ----------------------------------------------------
-        # Hata
-        # ----------------------------------------------------
 
-        if status_code in [
-            "ERROR",
-            "EXPIRED"
-        ]:
+# ============================================================
+# AUF CAROUSEL-VERARBEITUNG WARTEN
+# ============================================================
 
-            raise RuntimeError(
-                f"Instagram container hatası: {durum}"
-            )
+def container_hazir_olmasini_bekle(container_id):
 
-        # ----------------------------------------------------
-        # Timeout
-        # ----------------------------------------------------
+    print(
+        "\nInstagram verarbeitet das Carousel..."
+    )
+
+    print(
+        "Warte 5 Sekunden..."
+    )
+
+    time.sleep(5)
+
+    baslangic_zamani = time.time()
+
+    while True:
 
         gecen_sure = (
             time.time()
-            - baslangic
+            - baslangic_zamani
         )
 
         if gecen_sure > MAKSIMUM_BEKLEME:
 
             raise TimeoutError(
-                f"Container {MAKSIMUM_BEKLEME} saniye "
-                f"içinde hazır olmadı: {container_id}"
+                f"Carousel war nicht innerhalb von "
+                f"{MAKSIMUM_BEKLEME} Sekunden bereit."
             )
+
+        durum = (
+            container_status_prufen(
+                container_id
+            )
+        )
+
+        if durum == "FINISHED":
+
+            print(
+                "✓ Instagram Carousel ist bereit."
+            )
+
+            return True
+
+        if durum in (
+            "IN_PROGRESS",
+            "PROCESSING"
+        ):
+
+            print(
+                f"Carousel wird verarbeitet... "
+                f"{int(gecen_sure)} Sekunden vergangen."
+            )
+
+            time.sleep(
+                KONTROL_ARALIGI
+            )
+
+            continue
+
+        if durum == "ERROR":
+
+            raise RuntimeError(
+                "Fehler beim Verarbeiten des Carousel."
+            )
+
+        print(
+            f"Unerwarteter Container-Status: {durum}"
+        )
 
         time.sleep(
             KONTROL_ARALIGI
@@ -205,27 +319,21 @@ def container_bekle(container_id):
 
 
 # ============================================================
-# CHILD CONTAINER
+# CAROUSEL VERÖFFENTLICHEN
 # ============================================================
 
-def child_container_olustur(gorsel_url):
-
-    print()
-    print(
-        "Child container oluşturuluyor:"
-    )
+def carousel_yayinla(container_id):
 
     print(
-        gorsel_url
+        "\nInstagram Carousel wird veröffentlicht..."
     )
 
     yanit = requests.post(
 
-        f"{API_TEMEL}/{IG_USER_ID}/media",
+        f"{API_TEMEL}/{IG_USER_ID}/media_publish",
 
         data={
-            "image_url": gorsel_url,
-            "is_carousel_item": "true",
+            "creation_id": container_id,
             "access_token": ACCESS_TOKEN,
         },
 
@@ -234,9 +342,8 @@ def child_container_olustur(gorsel_url):
 
     if not yanit.ok:
 
-        print()
         print(
-            "❌ Child container oluşturulamadı:"
+            "❌ FEHLER - Carousel konnte nicht veröffentlicht werden:"
         )
 
         print(
@@ -245,117 +352,78 @@ def child_container_olustur(gorsel_url):
 
         yanit.raise_for_status()
 
-    container_id = (
-        yanit.json()["id"]
+    post_id = yanit.json().get("id")
+
+    print(
+        "\n========================================"
     )
 
     print(
-        f"✓ Child container: {container_id}"
-    )
-
-    return container_id
-
-
-# ============================================================
-# CAROUSEL CONTAINER
-# ============================================================
-
-def carousel_container_olustur(
-    child_ids,
-    caption
-):
-
-    print()
-    print(
-        "Carousel container oluşturuluyor..."
-    )
-
-    yanit = requests.post(
-
-        f"{API_TEMEL}/{IG_USER_ID}/media",
-
-        data={
-            "media_type": "CAROUSEL",
-            "children": ",".join(child_ids),
-            "caption": caption,
-            "access_token": ACCESS_TOKEN,
-        },
-
-        timeout=60
-    )
-
-    if not yanit.ok:
-
-        print()
-        print(
-            "❌ Carousel container oluşturulamadı:"
-        )
-
-        print(
-            yanit.text
-        )
-
-        yanit.raise_for_status()
-
-    container_id = (
-        yanit.json()["id"]
+        "✓ DEUTSCHES CAROUSEL ERFOLGREICH VERÖFFENTLICHT!"
     )
 
     print(
-        f"✓ Carousel container: {container_id}"
+        f"Post-ID: {post_id}"
     )
 
-    return container_id
+    print(
+        "========================================"
+    )
+
+    return post_id
 
 
 # ============================================================
-# CAROUSEL YAYINLA
+# HAUPTPROGRAMM
 # ============================================================
 
-def carousel_yayinla():
+def main():
 
-    print()
-    print("=" * 60)
-    print("INSTAGRAM CAROUSEL YAYINI")
-    print("=" * 60)
+    print(
+        "========================================"
+    )
+
+    print(
+        "DEUTSCHES INSTAGRAM CAROUSEL"
+    )
+
+    print(
+        "========================================"
+    )
 
     # --------------------------------------------------------
-    # 1. İçerik JSON
+    # 1. Inhaltsdatei suchen
     # --------------------------------------------------------
 
     icerik_dosyasi = (
         son_icerik_dosyasi()
     )
 
-    print()
     print(
-        f"İçerik: {icerik_dosyasi}"
+        f"\nInhalt: {icerik_dosyasi.name}"
     )
 
-    icerik = json.loads(
+    # --------------------------------------------------------
+    # 2. Inhalt lesen
+    # --------------------------------------------------------
 
+    icerik = json.loads(
         icerik_dosyasi.read_text(
             encoding="utf-8"
         )
     )
 
     # --------------------------------------------------------
-    # 2. İçeriğin tarihini al
+    # 3. Bildordner
     # --------------------------------------------------------
 
-    tarih = icerik.get(
-        "tarih"
-    )
+    tarih = icerik.get("tarih")
 
     if not tarih:
 
         raise ValueError(
-            "İçerik JSON dosyasında 'tarih' bulunamadı."
+            "'tarih' nicht im JSON gefunden."
         )
-
-    # --------------------------------------------------------
-    # 3. AYNI İÇERİĞE AİT GÖRSEL KLASÖRÜ
-    # --------------------------------------------------------
 
     gorsel_klasoru = (
         gorsel_klasoru_bul(
@@ -364,79 +432,52 @@ def carousel_yayinla():
     )
 
     print(
-        f"Görseller: {gorsel_klasoru}"
+        f"Bilder: {gorsel_klasoru}"
     )
 
     # --------------------------------------------------------
-    # 4. PNG dosyaları
+    # 4. Bildliste
     # --------------------------------------------------------
 
-    png_dosyalari = sorted(
-        gorsel_klasoru.glob("*.png")
+    bilder = bilder_liste(
+        gorsel_klasoru
     )
 
-    if not png_dosyalari:
-
-        raise FileNotFoundError(
-            f"{gorsel_klasoru} klasöründe PNG bulunamadı."
-        )
-
-    print()
     print(
-        f"{len(png_dosyalari)} görsel bulundu."
+        f"{len(bilder)} PNG-Bilder gefunden."
     )
 
     # --------------------------------------------------------
-    # 5. Instagram child container'ları
+    # 5. GitHub URLs
     # --------------------------------------------------------
 
-    child_ids = []
+    bild_urls = []
 
-    for sira, png_dosyasi in enumerate(
-        png_dosyalari,
-        start=1
-    ):
+    for i, bild in enumerate(bilder):
 
-        print()
-        print(
-            f"[{sira}/{len(png_dosyalari)}]"
+        # URL mit Datum erstellen
+        url = (
+            f"https://raw.githubusercontent.com/"
+            f"{GITHUB_USERNAME}/"
+            f"{GITHUB_REPO}/"
+            f"main/gorseller/"
+            f"{tarih}/"
+            f"{bild.name}"
         )
 
-        # Dosya yolu
-        gorsel_yolu = png_dosyasi.as_posix()
-
-        # GitHub Raw URL
-        gorsel_url = github_raw_url(
-            Path(gorsel_yolu)
-        )
+        bild_urls.append(url)
 
         print(
-            f"URL: {gorsel_url}"
-        )
-
-        # Child container oluştur
-        child_id = (
-            child_container_olustur(
-                gorsel_url
-            )
-        )
-
-        # Hazır olmasını bekle
-        container_bekle(
-            child_id
-        )
-
-        child_ids.append(
-            child_id
+            f"  {i+1}. {bild.name}"
         )
 
     # --------------------------------------------------------
-    # 6. Caption
+    # 6. Caption & Hashtags
     # --------------------------------------------------------
 
     caption = icerik.get(
         "caption",
-        ""
+        "Deutsches Carousel 🇩🇪"
     )
 
     hashtagler = icerik.get(
@@ -446,106 +487,51 @@ def carousel_yayinla():
 
     if hashtagler:
 
-        caption = (
-            caption
-            + "\n\n"
+        caption += (
+            "\n\n"
             + " ".join(hashtagler)
         )
 
-    # --------------------------------------------------------
-    # 7. Ana Carousel container
-    # --------------------------------------------------------
-
-    carousel_id = (
-        carousel_container_olustur(
-            child_ids,
-            caption
-        )
-    )
-
-    # --------------------------------------------------------
-    # 8. Ana container hazır mı?
-    # --------------------------------------------------------
-
-    container_bekle(
-        carousel_id
-    )
-
-    # --------------------------------------------------------
-    # 9. Yayınla
-    # --------------------------------------------------------
-
-    print()
     print(
-        "Carousel Instagram'a yayınlanıyor..."
+        f"\nCaption: {caption[:100]}..."
     )
-
-    yanit = requests.post(
-
-        f"{API_TEMEL}/{IG_USER_ID}/media_publish",
-
-        data={
-            "creation_id": carousel_id,
-            "access_token": ACCESS_TOKEN,
-        },
-
-        timeout=60
-    )
-
-    if not yanit.ok:
-
-        print()
-        print(
-            "❌ CAROUSEL YAYINLANAMADI"
-        )
-
-        print(
-            yanit.text
-        )
-
-        yanit.raise_for_status()
 
     # --------------------------------------------------------
-    # 10. Başarılı
+    # 7. Carousel Container erstellen
     # --------------------------------------------------------
 
-    post_id = (
-        yanit.json().get("id")
+    container_id = (
+        media_container_olustur(
+            bild_urls,
+            caption,
+            hashtagler
+        )
     )
 
-    print()
-    print("=" * 60)
-    print("✓ CAROUSEL BAŞARIYLA YAYINLANDI")
-    print("=" * 60)
+    # --------------------------------------------------------
+    # 8. Auf Verarbeitung warten
+    # --------------------------------------------------------
 
-    print()
+    container_hazir_olmasini_bekle(
+        container_id
+    )
+
+    # --------------------------------------------------------
+    # 9. Veröffentlichen
+    # --------------------------------------------------------
+
+    post_id = carousel_yayinla(
+        container_id
+    )
+
     print(
-        f"Instagram Post ID: {post_id}"
+        "\n✓ Deutsches Carousel erfolgreich veröffentlicht!"
     )
-
-    print()
 
 
 # ============================================================
-# MAIN
+# PROGRAMM AUSFÜHREN
 # ============================================================
 
 if __name__ == "__main__":
-
-    try:
-
-        carousel_yayinla()
-
-    except Exception as hata:
-
-        print()
-        print("=" * 60)
-        print("❌ CAROUSEL HATASI")
-        print("=" * 60)
-
-        print()
-        print(
-            hata
-        )
-
-        raise
+    main()

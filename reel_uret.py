@@ -25,8 +25,8 @@ GITHUB_REPO = os.environ["GITHUB_REPO"]
 # ElevenLabs
 ELEVENLABS_API_KEY = os.environ["ELEVENLABS_API_KEY"]
 
-# Sabit kullanılacak ses
-ELEVENLABS_VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"
+# Almanca ses (Daniel)
+ELEVENLABS_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
 
 # Model
 ELEVENLABS_MODEL_ID = "eleven_multilingual_v2"
@@ -158,7 +158,7 @@ def reel_ses_metni_olustur(icerik):
 
 
 # ============================================================
-# ELEVENLABS TÜRKÇE SES ÜRET
+# ELEVENLABS ALMANCA SES ÜRET
 # ============================================================
 
 def ses_uret(icerik, tarih):
@@ -192,7 +192,7 @@ def ses_uret(icerik, tarih):
 
     print()
     print(
-        "ElevenLabs ile Türkçe seslendirme oluşturuluyor..."
+        "ElevenLabs mit deutscher Sprachausgabe wird erstellt..."
     )
 
     print(
@@ -200,11 +200,11 @@ def ses_uret(icerik, tarih):
     )
 
     print(
-        f"Model: {ELEVENLABS_MODEL_ID}"
+        f"Modell: {ELEVENLABS_MODEL_ID}"
     )
 
     print(
-        f"Seslendirme metni: {metin}"
+        f"Sprachtext: {metin}"
     )
 
     url = (
@@ -240,18 +240,18 @@ def ses_uret(icerik, tarih):
     except requests.RequestException as hata:
 
         raise RuntimeError(
-            f"ElevenLabs bağlantı hatası: {hata}"
+            f"ElevenLabs Verbindungsfehler: {hata}"
         )
 
     print(
-        f"ElevenLabs HTTP durumu: {yanit.status_code}"
+        f"ElevenLabs HTTP-Status: {yanit.status_code}"
     )
 
     if not yanit.ok:
 
         print()
         print(
-            "❌ ELEVENLABS HATASI"
+            "❌ ELEVENLABS FEHLER"
         )
 
         print(
@@ -263,10 +263,10 @@ def ses_uret(icerik, tarih):
     if not yanit.content:
 
         raise RuntimeError(
-            "ElevenLabs başarılı cevap verdi ancak ses verisi boş."
+            "ElevenLabs Erfolgreiche Antwort aber Audiodaten leer."
         )
 
-    # MP3 kaydet
+    # MP3 speichern
     with open(
         ses_yolu,
         "wb"
@@ -276,11 +276,11 @@ def ses_uret(icerik, tarih):
             yanit.content
         )
 
-    # Dosya kontrolü
+    # Datei prüfen
     if not ses_yolu.exists():
 
         raise FileNotFoundError(
-            f"Ses dosyası oluşturulamadı: {ses_yolu}"
+            f"Audiodatei konnte nicht erstellt werden: {ses_yolu}"
         )
 
     dosya_boyutu = (
@@ -290,22 +290,22 @@ def ses_uret(icerik, tarih):
     if dosya_boyutu == 0:
 
         raise RuntimeError(
-            "ElevenLabs ses dosyası 0 byte oluştu."
+            "ElevenLabs Audiodatei mit 0 Byte erstellt."
         )
 
     print(
-        f"✓ Türkçe ses oluşturuldu: {ses_yolu}"
+        f"✓ Deutsche Sprache erstellt: {ses_yolu}"
     )
 
     print(
-        f"✓ Ses boyutu: {dosya_boyutu} byte"
+        f"✓ Dateigröße: {dosya_boyutu} byte"
     )
 
     return ses_yolu
 
 
 # ============================================================
-# SES SÜRESİNİ ÖLÇ
+# AUDIO-DAUER MESSEN
 # ============================================================
 
 def ses_suresini_bul(ses_yolu):
@@ -334,8 +334,8 @@ def ses_suresini_bul(ses_yolu):
     except FileNotFoundError:
 
         raise RuntimeError(
-            "ffprobe bulunamadı. "
-            "FFmpeg kurulumu kontrol edilmeli."
+            "ffprobe nicht gefunden. "
+            "FFmpeg-Installation prüfen."
         )
 
     try:
@@ -347,25 +347,25 @@ def ses_suresini_bul(ses_yolu):
     except ValueError:
 
         raise RuntimeError(
-            f"Ses süresi okunamadı: "
+            f"Audiodauer konnte nicht gelesen werden: "
             f"{sonuc.stdout}"
         )
 
     if sure <= 0:
 
         raise RuntimeError(
-            "Ses süresi 0 veya geçersiz."
+            "Audiodauer 0 oder ungültig."
         )
 
     print(
-        f"✓ Ses süresi: {sure:.2f} saniye"
+        f"✓ Audiodauer: {sure:.2f} Sekunden"
     )
 
     return sure
 
 
 # ============================================================
-# VIDEO ÜRET
+# VIDEO ERSTELLEN
 # ============================================================
 
 def video_uret(
@@ -387,7 +387,7 @@ def video_uret(
     )
 
     # --------------------------------------------------------
-    # PNG dosyaları
+    # PNG-Dateien
     # --------------------------------------------------------
 
     png_dosyalari = sorted(
@@ -397,15 +397,15 @@ def video_uret(
     if not png_dosyalari:
 
         raise FileNotFoundError(
-            f"{gorsel_klasoru} klasöründe PNG bulunamadı."
+            f"PNG nicht gefunden in {gorsel_klasoru}."
         )
 
     print(
-        f"{len(png_dosyalari)} PNG dosyası bulundu."
+        f"{len(png_dosyalari)} PNG-Dateien gefunden."
     )
 
     # --------------------------------------------------------
-    # Ses süresi
+    # Audiodauer
     # --------------------------------------------------------
 
     ses_suresi = (
@@ -415,11 +415,8 @@ def video_uret(
     )
 
     # --------------------------------------------------------
-    # Her görsel için süre
+    # Dauer pro Folie
     # --------------------------------------------------------
-
-    # Ses daha uzunsa görseller otomatik olarak uzar.
-    # Çok kısa seslerde ise her görsel en az 2 saniye kalır.
 
     minimum_video_suresi = (
         len(png_dosyalari)
@@ -437,15 +434,15 @@ def video_uret(
     )
 
     print(
-        f"Video hedef süresi: {video_suresi:.2f} saniye"
+        f"Video-Zieldauer: {video_suresi:.2f} Sekunden"
     )
 
     print(
-        f"Slayt başına süre: {slayt_suresi:.2f} saniye"
+        f"Dauer pro Folie: {slayt_suresi:.2f} Sekunden"
     )
 
     # --------------------------------------------------------
-    # Video yolu
+    # Videopfad
     # --------------------------------------------------------
 
     reel_yolu = (
@@ -454,7 +451,7 @@ def video_uret(
     )
 
     # --------------------------------------------------------
-    # FFmpeg concat dosyası
+    # FFmpeg concat-Datei
     # --------------------------------------------------------
 
     files_txt = (
@@ -482,7 +479,7 @@ def video_uret(
                 f"duration {slayt_suresi}\n"
             )
 
-        # Son görseli tekrar ekle
+        # Letzte Folie erneut hinzufügen
         son_png = (
             png_dosyalari[-1].resolve()
         )
@@ -492,7 +489,7 @@ def video_uret(
         )
 
     # --------------------------------------------------------
-    # FFmpeg kontrol
+    # FFmpeg-Prüfung
     # --------------------------------------------------------
 
     try:
@@ -510,22 +507,22 @@ def video_uret(
     except FileNotFoundError:
 
         raise RuntimeError(
-            "FFmpeg bulunamadı."
+            "FFmpeg nicht gefunden."
         )
 
     if ffmpeg_kontrol.returncode != 0:
 
         raise RuntimeError(
-            "FFmpeg çalıştırılamadı."
+            "FFmpeg konnte nicht ausgeführt werden."
         )
 
     # --------------------------------------------------------
-    # Video oluştur
+    # Video erstellen
     # --------------------------------------------------------
 
     print()
     print(
-        "FFmpeg ile sesli Reel oluşturuluyor..."
+        "FFmpeg erstellt Reel mit Sprachausgabe..."
     )
 
     ffmpeg_komut = [
@@ -566,7 +563,6 @@ def video_uret(
         "-b:a",
         "128k",
 
-        # Ses daha kısa ise videonun geri kalanını sessizlikle doldur.
         "-af",
         "apad",
 
@@ -586,13 +582,13 @@ def video_uret(
     )
 
     # --------------------------------------------------------
-    # Son kontrol
+    # Abschließende Prüfung
     # --------------------------------------------------------
 
     if not reel_yolu.exists():
 
         raise FileNotFoundError(
-            f"FFmpeg video oluşturamadı: "
+            f"FFmpeg Video konnte nicht erstellt werden: "
             f"{reel_yolu}"
         )
 
@@ -603,28 +599,28 @@ def video_uret(
     if video_boyutu == 0:
 
         raise RuntimeError(
-            "Video dosyası 0 byte oluştu."
+            "Videodatei mit 0 Byte erstellt."
         )
 
     print(
-        f"✓ Sesli Reel hazır: {reel_yolu}"
+        f"✓ Deutsches Reel bereit: {reel_yolu}"
     )
 
     print(
-        f"✓ Video boyutu: {video_boyutu} byte"
+        f"✓ Videogröße: {video_boyutu} byte"
     )
 
     return reel_yolu
 
 
 # ============================================================
-# GITHUB'A REEL GÖNDER
+# REEL ZU GITHUB HOCHLADEN
 # ============================================================
 
 def reel_github_ye_gonder(video_yolu):
 
     print(
-        "\nVideo GitHub'a gönderiliyor..."
+        "\nVideo wird zu GitHub hochgeladen..."
     )
 
     try:
@@ -655,7 +651,7 @@ def reel_github_ye_gonder(video_yolu):
                 "git",
                 "commit",
                 "-m",
-                "reel: sesli video yayını"
+                "reel: Deutsches Video mit Sprachausgabe"
             ],
 
             capture_output=True,
@@ -672,14 +668,13 @@ def reel_github_ye_gonder(video_yolu):
             if "nothing to commit" in cikti:
 
                 print(
-                    "Yeni Reel commit edilecek "
-                    "değişiklik bulunamadı."
+                    "Keine Änderungen zum Commit für neues Reel gefunden."
                 )
 
             else:
 
                 print(
-                    "Git commit uyarısı:"
+                    "Git Commit-Warnung:"
                 )
 
                 print(
@@ -693,7 +688,7 @@ def reel_github_ye_gonder(video_yolu):
         else:
 
             print(
-                "✓ Reel commit edildi."
+                "✓ Reel gecommitet."
             )
 
         subprocess.run(
@@ -708,13 +703,13 @@ def reel_github_ye_gonder(video_yolu):
         )
 
         print(
-            "✓ Sesli Reel GitHub'a gönderildi."
+            "✓ Deutsches Reel zu GitHub hochgeladen."
         )
 
     except subprocess.CalledProcessError as hata:
 
         raise RuntimeError(
-            f"GitHub Reel yükleme işlemi başarısız: "
+            f"GitHub Reel-Upload fehlgeschlagen: "
             f"{hata}"
         )
 
@@ -727,23 +722,23 @@ def reel_github_ye_gonder(video_yolu):
     )
 
     print(
-        f"Instagram video URL:\n{raw_url}"
+        f"Instagram Video-URL:\n{raw_url}"
     )
 
     return raw_url
 
 
 # ============================================================
-# REEL CONTAINER OLUŞTUR
+# REEL CONTAINER ERSTELLEN
 # ============================================================
 
 def reel_container_olustur(video_url):
 
     print(
-        "\nInstagram Reels container oluşturuluyor..."
+        "\nInstagram Reels Container wird erstellt..."
     )
 
-    # Reel açıklaması
+    # Reel-Beschreibung
     icerik_dosyasi = (
         son_icerik_dosyasi()
     )
@@ -763,7 +758,7 @@ def reel_container_olustur(video_url):
 
         caption = reel.get(
             "baslik",
-            "Reels video yayını 🎬"
+            "Reels Video 🎬"
         )
 
         hashtagler = icerik.get(
@@ -783,7 +778,7 @@ def reel_container_olustur(video_url):
     except Exception:
 
         caption = (
-            "Reels video yayını 🎬"
+            "Reels Video 🎬"
         )
 
     yanit = requests.post(
@@ -803,7 +798,7 @@ def reel_container_olustur(video_url):
     if not yanit.ok:
 
         print(
-            "HATA - Reel container oluşturulamadı:"
+            "FEHLER - Reels Container konnte nicht erstellt werden:"
         )
 
         print(
@@ -817,7 +812,7 @@ def reel_container_olustur(video_url):
     )
 
     print(
-        f"✓ Reels container oluşturuldu: "
+        f"✓ Reels Container erstellt: "
         f"{container_id}"
     )
 
@@ -825,7 +820,7 @@ def reel_container_olustur(video_url):
 
 
 # ============================================================
-# CONTAINER DURUMU
+# CONTAINER STATUS
 # ============================================================
 
 def container_durumunu_kontrol_et(container_id):
@@ -847,7 +842,7 @@ def container_durumunu_kontrol_et(container_id):
         if not yanit.ok:
 
             print(
-                "Container durum kontrolü başarısız:"
+                "Container-Statusprüfung fehlgeschlagen:"
             )
 
             print(
@@ -867,7 +862,7 @@ def container_durumunu_kontrol_et(container_id):
         )
 
         print(
-            f"Instagram container durumu: "
+            f"Instagram Container Status: "
             f"{status_code or status}"
         )
 
@@ -876,24 +871,24 @@ def container_durumunu_kontrol_et(container_id):
     except requests.RequestException as hata:
 
         print(
-            f"Durum kontrolünde bağlantı hatası: {hata}"
+            f"Fehler bei Statusprüfung: {hata}"
         )
 
         return None
 
 
 # ============================================================
-# REEL HAZIR OLANA KADAR BEKLE
+# AUF REEL-FERTIGSTELLUNG WARTEN
 # ============================================================
 
 def container_hazir_olmasini_bekle(container_id):
 
     print(
-        "\nInstagram videoyu işliyor..."
+        "\nInstagram verarbeitet das Video..."
     )
 
     print(
-        f"İlk {ILK_BEKLEME} saniye bekleniyor..."
+        f"Warte {ILK_BEKLEME} Sekunden..."
     )
 
     time.sleep(
@@ -912,9 +907,8 @@ def container_hazir_olmasini_bekle(container_id):
         if gecen_sure > MAKSIMUM_BEKLEME:
 
             raise TimeoutError(
-                "Instagram videosu "
-                f"{MAKSIMUM_BEKLEME} saniye içinde "
-                "hazır olmadı."
+                "Instagram Video war nicht "
+                f"innerhalb von {MAKSIMUM_BEKLEME} Sekunden bereit."
             )
 
         durum = (
@@ -926,7 +920,7 @@ def container_hazir_olmasini_bekle(container_id):
         if durum == "FINISHED":
 
             print(
-                "✓ Instagram videosu hazır."
+                "✓ Instagram Video ist bereit."
             )
 
             return True
@@ -937,8 +931,8 @@ def container_hazir_olmasini_bekle(container_id):
         ):
 
             print(
-                f"Video hâlâ işleniyor... "
-                f"{int(gecen_sure)} saniye geçti."
+                f"Video wird noch verarbeitet... "
+                f"{int(gecen_sure)} Sekunden vergangen."
             )
 
             time.sleep(
@@ -950,12 +944,12 @@ def container_hazir_olmasini_bekle(container_id):
         if durum == "ERROR":
 
             raise RuntimeError(
-                "Instagram Reel container "
-                "işlenirken ERROR oluştu."
+                "Beim Verarbeiten des Reels "
+                "ist ein Fehler aufgetreten."
             )
 
         print(
-            f"Beklenmeyen container durumu: {durum}"
+            f"Unerwarteter Container-Status: {durum}"
         )
 
         time.sleep(
@@ -964,7 +958,7 @@ def container_hazir_olmasini_bekle(container_id):
 
 
 # ============================================================
-# REEL YAYINLA
+# REEL VERÖFFENTLICHEN
 # ============================================================
 
 def reel_yayinla(video_yolu):
@@ -990,7 +984,7 @@ def reel_yayinla(video_yolu):
     )
 
     # --------------------------------------------------------
-    # Hazır olmasını bekle
+    # Auf Fertigstellung warten
     # --------------------------------------------------------
 
     container_hazir_olmasini_bekle(
@@ -998,11 +992,11 @@ def reel_yayinla(video_yolu):
     )
 
     # --------------------------------------------------------
-    # Yayınla
+    # Veröffentlichen
     # --------------------------------------------------------
 
     print(
-        "\nInstagram Reels yayınlanıyor..."
+        "\nInstagram Reels wird veröffentlicht..."
     )
 
     yanit = requests.post(
@@ -1020,7 +1014,7 @@ def reel_yayinla(video_yolu):
     if not yanit.ok:
 
         print(
-            "HATA - Reel yayınlanamadı:"
+            "FEHLER - Reel konnte nicht veröffentlicht werden:"
         )
 
         print(
@@ -1038,11 +1032,11 @@ def reel_yayinla(video_yolu):
     )
 
     print(
-        "✓ SESLİ REELS BAŞARIYLA YAYINLANDI!"
+        "✓ DEUTSCHES REELS ERFOLGREICH VERÖFFENTLICHT!"
     )
 
     print(
-        f"Post ID: {post_id}"
+        f"Post-ID: {post_id}"
     )
 
     print(
@@ -1053,7 +1047,7 @@ def reel_yayinla(video_yolu):
 
 
 # ============================================================
-# ANA PROGRAM
+# HAUPTPROGRAMM
 # ============================================================
 
 def main():
@@ -1063,7 +1057,7 @@ def main():
     )
 
     print(
-        "Instagram Sesli Reels Otomasyonu Başlıyor"
+        "Instagram Reels mit deutscher Sprachausgabe"
     )
 
     print(
@@ -1071,7 +1065,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 1. İçerik dosyasını bul
+    # 1. Inhaltsdatei suchen
     # --------------------------------------------------------
 
     icerik_dosyasi = (
@@ -1079,7 +1073,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 2. İçeriği oku
+    # 2. Inhalt lesen
     # --------------------------------------------------------
 
     icerik = json.loads(
@@ -1089,7 +1083,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 3. Tarih
+    # 3. Datum
     # --------------------------------------------------------
 
     tarih = icerik.get(
@@ -1099,11 +1093,11 @@ def main():
     if not tarih:
 
         raise ValueError(
-            "İçerik JSON dosyasında 'tarih' bulunamadı."
+            "'tarih' nicht im JSON gefunden."
         )
 
     # --------------------------------------------------------
-    # 4. Aynı içeriğin görsel klasörü
+    # 4. Bildordner für diesen Inhalt
     # --------------------------------------------------------
 
     gorsel_klasoru = (
@@ -1113,15 +1107,15 @@ def main():
     )
 
     print(
-        f"\nİçerik: {icerik_dosyasi.name}"
+        f"\nInhalt: {icerik_dosyasi.name}"
     )
 
     print(
-        f"Görseller: {gorsel_klasoru}"
+        f"Bilder: {gorsel_klasoru}"
     )
 
     # --------------------------------------------------------
-    # 5. ElevenLabs ses üret
+    # 5. ElevenLabs Sprache erstellen
     # --------------------------------------------------------
 
     ses_yolu = (
@@ -1132,7 +1126,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 6. Video üret
+    # 6. Video erstellen
     # --------------------------------------------------------
 
     video_yolu = (
@@ -1144,7 +1138,7 @@ def main():
     )
 
     # --------------------------------------------------------
-    # 7. Reel yayınla
+    # 7. Reel veröffentlichen
     # --------------------------------------------------------
 
     reel_yayinla(
@@ -1152,12 +1146,12 @@ def main():
     )
 
     print(
-        "\n✓ Türkçe sesli Reel başarıyla yayınlandı!"
+        "\n✓ Deutsches Reel erfolgreich veröffentlicht!"
     )
 
 
 # ============================================================
-# PROGRAMI ÇALIŞTIR
+# PROGRAMM AUSFÜHREN
 # ============================================================
 
 if __name__ == "__main__":
