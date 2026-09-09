@@ -12,35 +12,55 @@ permissions:
 jobs:
   carousel:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Depoyu indir
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Python kurulumu
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: |
+
+      - name: Bağımlılıkları yükle
+        run: |
           python -m pip install --upgrade pip
           pip install playwright anthropic python-dotenv requests
           playwright install --with-deps chromium
-      - run: git config --global user.email "action@github.com" && git config --global user.name "GitHub Action"
-      
+
+      - name: Git ayarları
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+
       - name: İçerik üret
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python icerik_uret.py
-      
+        run: |
+          python icerik_uret.py
+
       - name: Görsel üret
-        run: python gorsel_uret.py
-      
+        run: |
+          python gorsel_uret.py
+
+      - name: Oluşturulan dosyaları GitHub'a kaydet
+        run: |
+          git add kullanilan_konular.json cikti/ gorseller/
+          git diff --cached --quiet || git commit -m "carousel: $(date +%Y-%m-%d-%H-%M-%S)"
+          git push
+
+      - name: Görsellerin erişilebilir olmasını bekle
+        run: |
+          sleep 15
+
       - name: Carousel yayınla
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
           GITHUB_USERNAME: gonatureverse-collab
-          GITHUB_REPO: instagram-otomasyon
-        run: python carousel_yayinla.py
-      
-      - name: Değişiklikleri kaydet
+          GITHUB_REPO: instagram-otomasyon-deutsch
+          GITHUB_BRANCH: main
         run: |
-          git add kullanilan_konular.json cikti/ gorseller/
-          git diff --cached --quiet || git commit -m "carousel: $(date +%Y-%m-%d-%H-%M)"
-          git push
+          python carousel_yayinla.py
