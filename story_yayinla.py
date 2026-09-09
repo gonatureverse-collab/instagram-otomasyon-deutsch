@@ -13,16 +13,57 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ACCESS_TOKEN = os.environ["INSTAGRAM_ACCESS_TOKEN"]
-IG_USER_ID = os.environ["INSTAGRAM_BUSINESS_ACCOUNT_ID"]
 
-GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
-GITHUB_REPO = os.environ["GITHUB_REPO"]
+def ortam_degiskeni_al(anahtar):
+    deger = os.environ.get(anahtar)
 
+    if not deger or not deger.strip():
+        raise EnvironmentError(
+            f"Eksik ortam değişkeni: {anahtar}"
+        )
+
+    return deger.strip()
+
+
+# Instagram
+ACCESS_TOKEN = ortam_degiskeni_al(
+    "INSTAGRAM_ACCESS_TOKEN"
+)
+
+IG_USER_ID = ortam_degiskeni_al(
+    "INSTAGRAM_BUSINESS_ACCOUNT_ID"
+)
+
+
+# GitHub
+GITHUB_USERNAME = ortam_degiskeni_al(
+    "GITHUB_USERNAME"
+)
+
+GITHUB_REPO = ortam_degiskeni_al(
+    "GITHUB_REPO"
+)
+
+GITHUB_BRANCH = os.environ.get(
+    "GITHUB_BRANCH",
+    "main"
+).strip()
+
+
+# Instagram Graph API
 API_SURUM = "v21.0"
-API_TEMEL = f"https://graph.instagram.com/{API_SURUM}"
+API_TEMEL = (
+    f"https://graph.facebook.com/{API_SURUM}"
+)
 
+
+# Story klasörü
 STORY_KLASOR = Path("stories")
+
+# Bekleme ayarları
+ILK_BEKLEME = 10
+KONTROL_ARALIGI = 5
+MAKSIMUM_DENEME = 60
 
 
 # ============================================================
@@ -30,19 +71,29 @@ STORY_KLASOR = Path("stories")
 # ============================================================
 
 def son_story_dosyasi():
-
     story_dosyalari = sorted(
         STORY_KLASOR.glob("*/story.png")
     )
 
     if not story_dosyalari:
-
         raise FileNotFoundError(
             "stories/ klasöründe story.png bulunamadı. "
-            "Önce story_uret.py çalıştır."
+            "Önce story_uret.py çalıştırın."
         )
 
-    return story_dosyalari[-1]
+    story_yolu = story_dosyalari[-1]
+
+    if not story_yolu.exists():
+        raise FileNotFoundError(
+            f"Story dosyası bulunamadı: {story_yolu}"
+        )
+
+    if story_yolu.stat().st_size == 0:
+        raise RuntimeError(
+            f"Story dosyası boş: {story_yolu}"
+        )
+
+    return story_yolu
 
 
 # ============================================================
@@ -50,24 +101,23 @@ def son_story_dosyasi():
 # ============================================================
 
 def story_githuba_gonder(story_yolu):
-
     print("\nStory GitHub'a gönderiliyor...")
 
     try:
-
-        # Güncel GitHub bilgilerini al
         subprocess.run(
             ["git", "fetch", "origin"],
             check=True
         )
 
-        # Story dosyasını ekle
         subprocess.run(
-            ["git", "add", str(story_yolu)],
+            [
+                "git",
+                "add",
+                str(story_yolu)
+            ],
             check=True
         )
 
-        # Commit
         commit = subprocess.run(
             [
                 "git",
@@ -79,23 +129,33 @@ def story_githuba_gonder(story_yolu):
             text=True
         )
 
-        # Commit yapılacak değişiklik yoksa sorun değil
-        if commit.returncode != 0:
+        commit_ciktisi = (
+            commit.stdout + commit.stderr
+        ).lower()
 
+        if commit.returncode == 0:
+            print("✓ Story commit edildi.")
+
+        elif "nothing to commit" in commit_ciktisi:
             print(
                 "Yeni commit oluşturulmadı. "
                 "Dosya zaten commit edilmiş olabilir."
             )
 
         else:
-
-            print(
-                "✓ Story commit edildi."
+            print(commit.stdout)
+            print(commit.stderr)
+            raise RuntimeError(
+                "Story commit işlemi başarısız oldu."
             )
 
-        # GitHub'a gönder
         subprocess.run(
-            ["git", "push"],
+            [
+                "git",
+                "push",
+                "origin",
+                GITHUB_BRANCH
+            ],
             check=True
         )
 
@@ -103,30 +163,25 @@ def story_githuba_gonder(story_yolu):
             "✓ Story GitHub'a başarıyla gönderildi."
         )
 
-    except subprocess.CalledProcessError as e:
-
+    except subprocess.CalledProcessError as hata:
         raise RuntimeError(
-            f"GitHub işlemi başarısız oldu: {e}"
-        )
+            f"GitHub işlemi başarısız oldu: {hata}"
+        ) from hata
 
-    # --------------------------------------------------------
-    # Raw GitHub URL
-    # --------------------------------------------------------
-
-    # Windows Path -> /
     relative_path = story_yolu.as_posix()
 
     raw_url = (
-        f"https://raw.githubusercontent.com/"
+        "https://raw.githubusercontent.com/"
         f"{GITHUB_USERNAME}/"
         f"{GITHUB_REPO}/"
-        f"main/"
+        f"{GITHUB_BRANCH}/"
         f"{relative_path}"
     )
 
-    print(
-        f"\nStory Raw URL:\n{raw_url}"
-    )
+    print(f"\nStory Raw URL:\n{raw_url}")
+
+    # Raw GitHub dosyasının erişilebilir olması için bekle
+    time.sleep(15)
 
     return raw_url
 
@@ -136,40 +191,35 @@ def story_githuba_gonder(story_yolu):
 # ============================================================
 
 def story_container_olustur(image_url):
-
     print(
         "\nInstagram Story container oluşturuluyor..."
     )
 
     yanit = requests.post(
-
         f"{API_TEMEL}/{IG_USER_ID}/media",
-
         data={
             "media_type": "STORIES",
             "image_url": image_url,
-            "access_token": ACCESS_TOKEN,
+            "access_token": ACCESS_TOKEN
         },
-
         timeout=60
     )
 
     if not yanit.ok:
-
-        print(
-            "HATA DETAYI:"
-        )
-
-        print(
-            yanit.text
-        )
-
+        print("HATA DETAYI:")
+        print(yanit.text)
         yanit.raise_for_status()
 
-    container_id = yanit.json()["id"]
+    veri = yanit.json()
+    container_id = veri.get("id")
+
+    if not container_id:
+        raise RuntimeError(
+            f"Instagram container ID döndürmedi: {veri}"
+        )
 
     print(
-        f"✓ Story container oluşturuldu: "
+        "✓ Story container oluşturuldu: "
         f"{container_id}"
     )
 
@@ -181,37 +231,28 @@ def story_container_olustur(image_url):
 # ============================================================
 
 def container_durumunu_kontrol_et(container_id):
-
     print(
         "\nStory'nin hazırlanması bekleniyor..."
     )
 
-    maksimum_deneme = 24
+    time.sleep(ILK_BEKLEME)
 
-    for deneme in range(1, maksimum_deneme + 1):
-
+    for deneme in range(
+        1,
+        MAKSIMUM_DENEME + 1
+    ):
         yanit = requests.get(
-
             f"{API_TEMEL}/{container_id}",
-
             params={
                 "fields": "status_code,status",
-                "access_token": ACCESS_TOKEN,
+                "access_token": ACCESS_TOKEN
             },
-
             timeout=60
         )
 
         if not yanit.ok:
-
-            print(
-                "STATUS HATASI:"
-            )
-
-            print(
-                yanit.text
-            )
-
+            print("STATUS HATASI:")
+            print(yanit.text)
             yanit.raise_for_status()
 
         veri = yanit.json()
@@ -224,34 +265,32 @@ def container_durumunu_kontrol_et(container_id):
             "status"
         )
 
+        mevcut_durum = (
+            status_code or status
+        )
+
         print(
-            f"Deneme {deneme}/{maksimum_deneme} "
+            f"Deneme {deneme}/{MAKSIMUM_DENEME} "
             f"→ status_code={status_code}, "
             f"status={status}"
         )
 
-        # Hazır
-        if status_code == "FINISHED":
-
+        if mevcut_durum == "FINISHED":
             print(
                 "✓ Story yayınlanmaya hazır."
             )
-
             return True
 
-        # Hata
-        if status_code in [
+        if mevcut_durum in (
             "ERROR",
             "EXPIRED"
-        ]:
-
+        ):
             raise RuntimeError(
-                f"Instagram Story container hatası: "
+                "Instagram Story container hatası: "
                 f"{veri}"
             )
 
-        # Henüz hazırlanıyor
-        time.sleep(5)
+        time.sleep(KONTROL_ARALIGI)
 
     raise TimeoutError(
         "Story container zamanında hazır olmadı."
@@ -263,51 +302,38 @@ def container_durumunu_kontrol_et(container_id):
 # ============================================================
 
 def story_yayinla(container_id):
-
     print(
         "\nInstagram Story yayınlanıyor..."
     )
 
     yanit = requests.post(
-
         f"{API_TEMEL}/{IG_USER_ID}/media_publish",
-
         data={
             "creation_id": container_id,
-            "access_token": ACCESS_TOKEN,
+            "access_token": ACCESS_TOKEN
         },
-
         timeout=60
     )
 
     if not yanit.ok:
-
-        print(
-            "YAYINLAMA HATASI:"
-        )
-
-        print(
-            yanit.text
-        )
-
+        print("YAYINLAMA HATASI:")
+        print(yanit.text)
         yanit.raise_for_status()
 
     veri = yanit.json()
+    post_id = veri.get("id")
 
     print(
         "\n========================================"
     )
-
     print(
         "✓ INSTAGRAM STORY YAYINLANDI!"
     )
-
+    print(
+        f"Post ID: {post_id}"
+    )
     print(
         "========================================"
-    )
-
-    print(
-        f"Post ID: {veri.get('id')}"
     )
 
     return veri
@@ -318,74 +344,42 @@ def story_yayinla(container_id):
 # ============================================================
 
 def main():
-
     print(
         "========================================"
     )
-
     print(
         "INSTAGRAM STORY YAYINLAMA"
     )
-
     print(
         "========================================"
     )
-
-    # --------------------------------------------------------
-    # 1. Story dosyasını bul
-    # --------------------------------------------------------
 
     story_yolu = son_story_dosyasi()
 
     print(
-        f"\nStory dosyası:"
+        f"\nStory dosyası:\n{story_yolu}"
     )
-
-    print(
-        story_yolu
-    )
-
-    # --------------------------------------------------------
-    # 2. GitHub'a gönder
-    # --------------------------------------------------------
 
     image_url = story_githuba_gonder(
         story_yolu
     )
 
-    # --------------------------------------------------------
-    # 3. Instagram container
-    # --------------------------------------------------------
-
     container_id = story_container_olustur(
         image_url
     )
 
-    # --------------------------------------------------------
-    # 4. Hazır olmasını bekle
-    # --------------------------------------------------------
-
     container_durumunu_kontrol_et(
         container_id
     )
-
-    # --------------------------------------------------------
-    # 5. Yayınla
-    # --------------------------------------------------------
 
     story_yayinla(
         container_id
     )
 
     print(
-        "\n✓ Story işlemi tamamlandı."
+        "\n✓ Story işlemi başarıyla tamamlandı."
     )
 
 
-# ============================================================
-# ÇALIŞTIR
-# ============================================================
-
 if __name__ == "__main__":
-
     main()
