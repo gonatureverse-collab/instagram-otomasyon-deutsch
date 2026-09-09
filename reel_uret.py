@@ -24,7 +24,7 @@ GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
 GITHUB_REPO = os.environ["GITHUB_REPO"]
 GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 
-# Microsoft Azure Speech
+# Azure Speech
 AZURE_SPEECH_KEY = os.environ["AZURE_SPEECH_KEY"]
 AZURE_SPEECH_REGION = os.environ["AZURE_SPEECH_REGION"]
 AZURE_SPEECH_VOICE = "de-DE-ConradNeural"
@@ -42,14 +42,14 @@ REEL_KLASOR = Path("reels")
 SLAYT_SURESI = 2.0
 FPS = 24
 
-# Instagram işlem ayarları
+# Instagram bekleme ayarları
 ILK_BEKLEME = 10
 KONTROL_ARALIGI = 10
 MAKSIMUM_BEKLEME = 300
 
 
 # ============================================================
-# İÇERİK VE GÖRSEL BULMA
+# İÇERİK VE GÖRSEL İŞLEMLERİ
 # ============================================================
 
 def son_icerik_dosyasi():
@@ -57,7 +57,7 @@ def son_icerik_dosyasi():
 
     if not dosyalar:
         raise FileNotFoundError(
-            "cikti/ klasöründe icerik_*.json dosyası bulunamadı."
+            "cikti klasöründe icerik_*.json dosyası bulunamadı."
         )
 
     return dosyalar[-1]
@@ -71,11 +71,6 @@ def gorsel_klasoru_bul(tarih):
             f"Görsel klasörü bulunamadı: {klasor}"
         )
 
-    if not klasor.is_dir():
-        raise NotADirectoryError(
-            f"Görsel yolu klasör değil: {klasor}"
-        )
-
     return klasor
 
 
@@ -84,13 +79,12 @@ def reel_ses_metni_olustur(icerik):
 
     if not reel:
         raise ValueError(
-            "İçerik JSON dosyasında 'reel' bölümü bulunamadı."
+            "JSON dosyasında 'reel' bölümü bulunamadı."
         )
 
-    sahneler = reel.get("sahneler", [])
     parcalar = []
 
-    for sahne in sahneler:
+    for sahne in reel.get("sahneler", []):
         if sahne and str(sahne).strip():
             parcalar.append(str(sahne).strip())
 
@@ -103,7 +97,7 @@ def reel_ses_metni_olustur(icerik):
 
     if not metin:
         raise ValueError(
-            "Seslendirme için kullanılabilecek Almanca metin bulunamadı."
+            "Seslendirme için metin bulunamadı."
         )
 
     return metin
@@ -117,7 +111,8 @@ def ses_uret(icerik, tarih):
     ses_klasoru = REEL_KLASOR / "sesler"
     ses_klasoru.mkdir(parents=True, exist_ok=True)
 
-    ses_yolu = ses_klasoru / f"ses_{tarih}.mp3"
+    # Azure ses dosyası olarak farklı isim kullanılır
+    ses_yolu = ses_klasoru / f"azure_ses_{tarih}.mp3"
 
     if ses_yolu.exists() and ses_yolu.stat().st_size > 0:
         print(f"✓ Azure ses dosyası zaten mevcut: {ses_yolu}")
@@ -136,7 +131,6 @@ def ses_uret(icerik, tarih):
 
     speech_config.speech_synthesis_voice_name = AZURE_SPEECH_VOICE
 
-    # MP3 çıktı formatı
     speech_config.set_speech_synthesis_output_format(
         speechsdk.SpeechSynthesisOutputFormat.Audio16Khz128KBitRateMonoMp3
     )
@@ -173,10 +167,7 @@ def ses_uret(icerik, tarih):
             f"Ses dosyası oluşturulamadı veya boş: {ses_yolu}"
         )
 
-    print(
-        f"✓ Ses dosyası boyutu: "
-        f"{ses_yolu.stat().st_size} byte"
-    )
+    print(f"✓ Ses dosyası boyutu: {ses_yolu.stat().st_size} byte")
 
     return ses_yolu
 
@@ -195,7 +186,7 @@ def ses_suresini_bul(ses_yolu):
             "format=duration",
             "-of",
             "default=noprint_wrappers=1:nokey=1",
-            str(ses_yolu),
+            str(ses_yolu)
         ],
         capture_output=True,
         text=True,
@@ -213,11 +204,12 @@ def ses_suresini_bul(ses_yolu):
         raise RuntimeError("Ses süresi geçersiz.")
 
     print(f"✓ Ses süresi: {sure:.2f} saniye")
+
     return sure
 
 
 # ============================================================
-# REEL VİDEOSU OLUŞTURMA
+# VİDEO OLUŞTURMA
 # ============================================================
 
 def video_uret(gorsel_klasoru, icerik_dosyasi, ses_yolu):
@@ -226,20 +218,32 @@ def video_uret(gorsel_klasoru, icerik_dosyasi, ses_yolu):
     )
 
     tarih = icerik["tarih"]
+
     REEL_KLASOR.mkdir(parents=True, exist_ok=True)
 
-    png_dosyalari = sorted(gorsel_klasoru.glob("*.png"))
+    png_dosyalari = sorted(
+        gorsel_klasoru.glob("*.png")
+    )
 
     if not png_dosyalari:
         raise FileNotFoundError(
-            f"{gorsel_klasoru} içinde PNG bulunamadı."
+            f"{gorsel_klasoru} içinde PNG dosyası bulunamadı."
         )
 
     ses_suresi = ses_suresini_bul(ses_yolu)
 
-    minimum_video_suresi = len(png_dosyalari) * SLAYT_SURESI
-    video_suresi = max(ses_suresi, minimum_video_suresi)
-    slayt_suresi = video_suresi / len(png_dosyalari)
+    minimum_video_suresi = (
+        len(png_dosyalari) * SLAYT_SURESI
+    )
+
+    video_suresi = max(
+        ses_suresi,
+        minimum_video_suresi
+    )
+
+    slayt_suresi = (
+        video_suresi / len(png_dosyalari)
+    )
 
     print(f"Video süresi: {video_suresi:.2f} saniye")
     print(f"Slayt süresi: {slayt_suresi:.2f} saniye")
@@ -249,25 +253,29 @@ def video_uret(gorsel_klasoru, icerik_dosyasi, ses_yolu):
 
     with files_txt.open("w", encoding="utf-8") as dosya:
         for png_yolu in png_dosyalari:
-            dosya.write(f"file '{png_yolu.resolve()}'\n")
-            dosya.write(f"duration {slayt_suresi}\n")
+            dosya.write(
+                f"file '{png_yolu.resolve()}'\n"
+            )
+            dosya.write(
+                f"duration {slayt_suresi}\n"
+            )
 
-        # Son görüntüyü tekrar ekle
         dosya.write(
             f"file '{png_dosyalari[-1].resolve()}'\n"
         )
 
-    print("\nFFmpeg ile seslendirmeli Reel oluşturuluyor...")
+    print("\nFFmpeg ile Reel oluşturuluyor...")
 
     ffmpeg_komut = [
         "ffmpeg",
         "-y",
+
         "-f", "concat",
         "-safe", "0",
         "-i", str(files_txt),
+
         "-i", str(ses_yolu),
 
-        # Instagram Reels için 1080x1350 dikey format
         "-vf",
         (
             "scale=1080:1350:"
@@ -278,23 +286,37 @@ def video_uret(gorsel_klasoru, icerik_dosyasi, ses_yolu):
         "-r", str(FPS),
         "-c:v", "libx264",
         "-pix_fmt", "yuv420p",
+
         "-c:a", "aac",
         "-b:a", "128k",
         "-af", "apad",
+
         "-shortest",
         "-movflags", "+faststart",
-        str(reel_yolu),
+
+        str(reel_yolu)
     ]
 
-    subprocess.run(ffmpeg_komut, check=True)
+    subprocess.run(
+        ffmpeg_komut,
+        check=True
+    )
 
-    if not reel_yolu.exists() or reel_yolu.stat().st_size == 0:
+    if not reel_yolu.exists():
         raise RuntimeError(
-            f"Reel dosyası oluşturulamadı: {reel_yolu}"
+            f"Reel oluşturulamadı: {reel_yolu}"
+        )
+
+    if reel_yolu.stat().st_size == 0:
+        raise RuntimeError(
+            f"Reel dosyası boş: {reel_yolu}"
         )
 
     print(f"✓ Reel oluşturuldu: {reel_yolu}")
-    print(f"✓ Video boyutu: {reel_yolu.stat().st_size} byte")
+    print(
+        f"✓ Video boyutu: "
+        f"{reel_yolu.stat().st_size} byte"
+    )
 
     return reel_yolu
 
@@ -327,18 +349,19 @@ def reel_githuba_gonder(video_yolu):
         text=True
     )
 
+    commit_ciktisi = (
+        commit.stdout + commit.stderr
+    ).lower()
+
     if commit.returncode == 0:
         print("✓ Reel commit edildi.")
-    else:
-        cikti = (
-            commit.stdout + commit.stderr
-        ).lower()
 
-        if "nothing to commit" in cikti:
-            print("Yeni commit edilecek değişiklik yok.")
-        else:
-            print(commit.stdout)
-            print(commit.stderr)
+    elif "nothing to commit" in commit_ciktisi:
+        print("Yeni commit edilecek değişiklik yok.")
+
+    else:
+        print(commit.stdout)
+        print(commit.stderr)
 
     subprocess.run(
         ["git", "push", "origin", GITHUB_BRANCH],
@@ -357,14 +380,13 @@ def reel_githuba_gonder(video_yolu):
 
     print(f"Instagram video URL'si:\n{video_url}")
 
-    # raw.githubusercontent.com önbelleğinin güncellenmesi için bekleme
     time.sleep(15)
 
     return video_url
 
 
 # ============================================================
-# INSTAGRAM CONTAINER
+# INSTAGRAM CONTAINER OLUŞTURMA
 # ============================================================
 
 def reel_container_olustur(video_url):
@@ -376,12 +398,22 @@ def reel_container_olustur(video_url):
         )
 
         reel = icerik.get("reel", {})
-        caption = reel.get("baslik", "Reels Video 🎬")
 
-        hashtagler = icerik.get("hashtagler", [])
+        caption = reel.get(
+            "baslik",
+            "Reels Video 🎬"
+        )
+
+        hashtagler = icerik.get(
+            "hashtagler",
+            []
+        )
 
         if hashtagler:
-            caption += "\n\n" + " ".join(hashtagler)
+            caption += (
+                "\n\n" +
+                " ".join(hashtagler)
+            )
 
     except Exception:
         caption = "Reels Video 🎬"
@@ -392,7 +424,7 @@ def reel_container_olustur(video_url):
             "media_type": "REELS",
             "video_url": video_url,
             "caption": caption,
-            "access_token": ACCESS_TOKEN,
+            "access_token": ACCESS_TOKEN
         },
         timeout=60
     )
@@ -403,13 +435,16 @@ def reel_container_olustur(video_url):
 
     container_id = yanit.json()["id"]
 
-    print(f"✓ Instagram Reels container oluşturuldu: {container_id}")
+    print(
+        "✓ Instagram Reels container oluşturuldu: "
+        f"{container_id}"
+    )
 
     return container_id
 
 
 # ============================================================
-# CONTAINER DURUMU
+# INSTAGRAM CONTAINER KONTROLÜ
 # ============================================================
 
 def container_durumunu_kontrol_et(container_id):
@@ -417,7 +452,7 @@ def container_durumunu_kontrol_et(container_id):
         f"{API_TEMEL}/{container_id}",
         params={
             "fields": "status_code,status",
-            "access_token": ACCESS_TOKEN,
+            "access_token": ACCESS_TOKEN
         },
         timeout=30
     )
@@ -428,26 +463,34 @@ def container_durumunu_kontrol_et(container_id):
 
     veri = yanit.json()
 
-    return veri.get("status_code") or veri.get("status")
+    return (
+        veri.get("status_code")
+        or veri.get("status")
+    )
 
 
 def container_hazir_olmasini_bekle(container_id):
     print("\nInstagram videoyu işliyor...")
+
     time.sleep(ILK_BEKLEME)
 
     baslangic = time.time()
 
     while True:
-        gecen = time.time() - baslangic
+        gecen_sure = time.time() - baslangic
 
-        if gecen > MAKSIMUM_BEKLEME:
+        if gecen_sure > MAKSIMUM_BEKLEME:
             raise TimeoutError(
                 "Instagram container zamanında hazır olmadı."
             )
 
-        durum = container_durumunu_kontrol_et(container_id)
+        durum = container_durumunu_kontrol_et(
+            container_id
+        )
 
-        print(f"Instagram container durumu: {durum}")
+        print(
+            f"Instagram container durumu: {durum}"
+        )
 
         if durum == "FINISHED":
             print("✓ Instagram videosu hazır.")
@@ -455,7 +498,7 @@ def container_hazir_olmasini_bekle(container_id):
 
         if durum == "ERROR":
             raise RuntimeError(
-                "Instagram Reel videosunu işlerken hata oluştu."
+                "Instagram Reel videosu işlenirken hata oluştu."
             )
 
         time.sleep(KONTROL_ARALIGI)
@@ -467,9 +510,14 @@ def container_hazir_olmasini_bekle(container_id):
 
 def reel_yayinla(video_yolu):
     video_url = reel_githuba_gonder(video_yolu)
-    container_id = reel_container_olustur(video_url)
 
-    container_hazir_olmasini_bekle(container_id)
+    container_id = reel_container_olustur(
+        video_url
+    )
+
+    container_hazir_olmasini_bekle(
+        container_id
+    )
 
     print("\nInstagram Reels yayınlanıyor...")
 
@@ -477,7 +525,7 @@ def reel_yayinla(video_yolu):
         f"{API_TEMEL}/{IG_USER_ID}/media_publish",
         data={
             "creation_id": container_id,
-            "access_token": ACCESS_TOKEN,
+            "access_token": ACCESS_TOKEN
         },
         timeout=60
     )
@@ -502,7 +550,7 @@ def reel_yayinla(video_yolu):
 
 def main():
     print("========================================")
-    print("Instagram Reels - Azure Almanca Seslendirme")
+    print("Instagram Reels - Azure Almanca Ses")
     print("========================================")
 
     icerik_dosyasi = son_icerik_dosyasi()
@@ -515,15 +563,25 @@ def main():
 
     if not tarih:
         raise ValueError(
-            "İçerik JSON dosyasında 'tarih' bulunamadı."
+            "JSON dosyasında 'tarih' bulunamadı."
         )
 
-    gorsel_klasoru = gorsel_klasoru_bul(tarih)
+    gorsel_klasoru = gorsel_klasoru_bul(
+        tarih
+    )
 
-    print(f"İçerik dosyası: {icerik_dosyasi}")
-    print(f"Görsel klasörü: {gorsel_klasoru}")
+    print(
+        f"İçerik dosyası: {icerik_dosyasi}"
+    )
 
-    ses_yolu = ses_uret(icerik, tarih)
+    print(
+        f"Görsel klasörü: {gorsel_klasoru}"
+    )
+
+    ses_yolu = ses_uret(
+        icerik,
+        tarih
+    )
 
     video_yolu = video_uret(
         gorsel_klasoru,
@@ -533,7 +591,10 @@ def main():
 
     reel_yayinla(video_yolu)
 
-    print("\n✓ Almanca seslendirmeli Reel başarıyla yayınlandı.")
+    print(
+        "\n✓ Almanca seslendirmeli Reel "
+        "başarıyla yayınlandı."
+    )
 
 
 if __name__ == "__main__":
