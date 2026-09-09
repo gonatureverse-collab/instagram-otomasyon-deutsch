@@ -29,39 +29,29 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           python -m pip install --upgrade pip
-          pip install playwright anthropic python-dotenv requests moviepy
-          playwright install --with-deps chromium
+          pip install requests python-dotenv azure-cognitiveservices-speech
 
       - name: Git ayarları
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
 
-      - name: Reel oluştur
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_USERNAME: gonatureverse-collab
-          GITHUB_REPO: instagram-otomasyon-deutsch
-          GITHUB_BRANCH: main
-        run: |
-          python reel_uret.py
-
-      - name: Reel dosyalarını GitHub'a kaydet
-        run: |
-          git add kullanilan_konular.json cikti/ gorseller/ reels/
-          git diff --cached --quiet || git commit -m "reel: $(date +%Y-%m-%d-%H-%M-%S)"
-          git push
-
-      - name: GitHub CDN güncellemesini bekle
-        run: |
-          sleep 15
-
-      - name: Reel yayınla
+      - name: Reel oluştur ve yayınla
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
+
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+
           GITHUB_USERNAME: gonatureverse-collab
           GITHUB_REPO: instagram-otomasyon-deutsch
           GITHUB_BRANCH: main
         run: |
-          python reel_yayinla.py
+          python -u reel_uret.py
+
+      - name: Oluşturulan dosyaları kaydet
+        run: |
+          git add kullanilan_konular.json cikti/ gorseller/ reels/
+          git diff --cached --quiet || git commit -m "reel: $(date +%Y-%m-%d-%H-%M-%S)"
+          git push origin main
