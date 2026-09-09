@@ -1,0 +1,51 @@
+{
+  "baslik": "Scooter fahren in Deutschland - So geht's!",
+  "kapak_emoji": "🛴",
+  "slaytlar": [
+    "Du brauchst einen Führerschein der Klasse AM oder einen gültigen PKW-Führerschein. Ohne Führerschein darfst du keinen Scooter fahren.",
+    "Dein Scooter muss eine Versicherungsplakette haben. Die Versicherung ist Pflicht in Deutschland und muss jedes Jahr erneuert werden.",
+    "Trag immer einen Helm! Es ist nicht nur sicherer, sondern in vielen Situationen auch gesetzlich vorgeschrieben.",
+    "Fahre nur auf der Straße oder auf speziellen Wegen. Gehwege sind verboten. Achte auf Verkehrsregeln wie bei einem Auto.",
+    "Dein Scooter muss technisch sicher sein: funktionierende Bremsen, Lichter und ein reflektierendes Nummernschild sind Pflicht."
+  ],
+  "emojiler": [
+    "🪪",
+    "🏷️",
+    "🪖",
+    "🛣️",
+    "✅"
+  ],
+  "reel": {
+    "baslik": "Scooter-Regeln in Deutschland erklärt",
+    "sahneler": [
+      "Schnitt: Jemand steigt auf einen Scooter. Text: 'Scooter fahren in Deutschland - was du wissen musst!'",
+      "Nahaufnahme: Führerschein und Versicherungsplakette. Text: 'Führerschein Klasse AM + Versicherung = Pflicht'",
+      "Schnitt: Person setzt Helm auf. Text: 'Immer Helm tragen - deine Sicherheit zählt'",
+      "Schnitt: Scooter fährt auf der Straße. Text: 'Nur auf Straßen und Wegen - nicht auf dem Gehweg'",
+      "Nahaufnahme: Bremsen, Lichter, Nummernschild. Text: 'Dein Scooter muss technisch in Ordnung sein'",
+      "Schnitt: Scooter-Fahrer fährt sicher. Text: 'Alle Regeln befolgen, sicher ankommen!'"
+    ],
+    "cta": "Speichert euch diese Tipps und teilt sie mit Freunden! Habt ihr noch Fragen? Schreibt einen Kommentar!"
+  },
+  "story": {
+    "baslik": "Scooter in Deutschland",
+    "metin": "Wusstest du, dass du für einen Scooter einen Führerschein brauchst?",
+    "anket": [
+      "Ja, das wusste ich",
+      "Nein, das wusste ich nicht"
+    ]
+  },
+  "caption": "Scooter fahren ist praktisch - aber es gibt wichtige Regeln! Du brauchst einen Führerschein, eine Versicherung, einen Helm und musst immer auf der Straße fahren. Speichert euch diesen Beitrag ab und teilt ihn, wenn ihr noch mehr Tipps zum Leben in Deutschland braucht!",
+  "hashtagler": [
+    "#Scooter",
+    "#DeutschlandTipp",
+    "#Verkehrsregeln",
+    "#WieMachtManDas",
+    "#DeutschlandErklärt",
+    "#LebenInDeutschland",
+    "#Mobilität",
+    "#Sicherheit"
+  ],
+  "konu": "Almanya'da scooter kullanımı nasıl yapılır",
+  "tarih": "2026-09-09_12-53-46"
+}
