@@ -1,11 +1,9 @@
-name: 09:00 Carousel Yayını
+name: 06:00 UTC Carousel Yayını
 
 on:
   schedule:
-    # Her gün 09:00 Berlin saati
-    # Yaz/kış saati otomatik olarak Europe/Berlin tarafından yönetilir
-    - cron: "15 11 * * *"
-      timezone: "Europe/Berlin"
+    # Her gün 06:00 UTC
+    - cron: "0 6 * * *"
 
   # Manuel çalıştırma
   workflow_dispatch:
@@ -28,7 +26,21 @@ jobs:
           fetch-depth: 0
 
       # ----------------------------------------
-      # 2. Python kurulumu
+      # 2. UTC saatini kontrol et
+      # ----------------------------------------
+      - name: UTC saatini kontrol et
+        run: |
+          echo "=== GitHub UTC Saati ==="
+          date -u '+%Y-%m-%d %H:%M:%S UTC'
+          echo ""
+          echo "Almanya saati:"
+          TZ=Europe/Berlin date '+%Y-%m-%d %H:%M:%S %Z'
+          echo ""
+          echo "Workflow tetikleyicisi:"
+          echo "${{ github.event_name }}"
+
+      # ----------------------------------------
+      # 3. Python kurulumu
       # ----------------------------------------
       - name: Python kurulumu
         uses: actions/setup-python@v5
@@ -36,7 +48,7 @@ jobs:
           python-version: "3.12"
 
       # ----------------------------------------
-      # 3. Bağımlılıkları yükle
+      # 4. Bağımlılıkları yükle
       # ----------------------------------------
       - name: Bağımlılıkları yükle
         run: |
@@ -45,7 +57,7 @@ jobs:
           playwright install --with-deps chromium
 
       # ----------------------------------------
-      # 4. Git ayarları
+      # 5. Git ayarları
       # ----------------------------------------
       - name: Git ayarları
         run: |
@@ -53,7 +65,7 @@ jobs:
           git config user.name "GitHub Action"
 
       # ----------------------------------------
-      # 5. İçerik üret
+      # 6. İçerik üret
       # ----------------------------------------
       - name: İçerik üret
         env:
@@ -62,14 +74,14 @@ jobs:
           python icerik_uret.py
 
       # ----------------------------------------
-      # 6. Görsel üret
+      # 7. Görsel üret
       # ----------------------------------------
       - name: Görsel üret
         run: |
           python gorsel_uret.py
 
       # ----------------------------------------
-      # 7. Oluşturulan dosyaları GitHub'a kaydet
+      # 8. Oluşturulan dosyaları GitHub'a kaydet
       # ----------------------------------------
       - name: Oluşturulan dosyaları GitHub'a kaydet
         run: |
@@ -83,14 +95,14 @@ jobs:
           fi
 
       # ----------------------------------------
-      # 8. Görsellerin erişilebilir olmasını bekle
+      # 9. Görsellerin erişilebilir olmasını bekle
       # ----------------------------------------
       - name: Görsellerin erişilebilir olmasını bekle
         run: |
           sleep 30
 
       # ----------------------------------------
-      # 9. Instagram Carousel yayınla
+      # 10. Instagram Carousel yayınla
       # ----------------------------------------
       - name: Carousel yayınla
         env:
