@@ -1,9 +1,11 @@
-name: 14:00 Reel Yayını
+name: 10:30 UTC Reel Yayını
 
 on:
   schedule:
-    - cron: "0 14 * * *"
-      timezone: "Europe/Berlin"
+    # Her gün 10:30 UTC
+    - cron: "30 10 * * *"
+
+  # Manuel çalıştırma
   workflow_dispatch:
 
 permissions:
@@ -14,10 +16,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Depoyu indir
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: UTC saatini kontrol et
+        run: |
+          echo "=== GitHub UTC Saati ==="
+          date -u '+%Y-%m-%d %H:%M:%S UTC'
+          echo ""
+          echo "Almanya saati:"
+          TZ=Europe/Berlin date '+%Y-%m-%d %H:%M:%S %Z'
+          echo ""
+          echo "Workflow tetikleyicisi:"
+          echo "${{ github.event_name }}"
 
       - name: Python kurulumu
         uses: actions/setup-python@v5
@@ -47,11 +61,17 @@ jobs:
           GITHUB_USERNAME: gonatureverse-collab
           GITHUB_REPO: instagram-otomasyon-deutsch
           GITHUB_BRANCH: main
+
         run: |
           python -u reel_uret.py
 
       - name: Oluşturulan dosyaları kaydet
         run: |
           git add kullanilan_konular.json cikti/ gorseller/ reels/
-          git diff --cached --quiet || git commit -m "reel: $(date +%Y-%m-%d-%H-%M-%S)"
-          git push origin main
+
+          if git diff --cached --quiet; then
+            echo "Kaydedilecek değişiklik yok."
+          else
+            git commit -m "reel: $(date -u +%Y-%m-%d-%H-%M-%S)"
+            git push origin main
+          fi
