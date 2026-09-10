@@ -1,9 +1,10 @@
-name: 10:00 Carousel Yayını
+name: 09:00 Carousel Yayını
 
 on:
   schedule:
-    - cron: "0 10 * * *"
-      timezone: "Europe/Berlin"
+    # Yaz saati: 07:00 UTC = 09:00 Europe/Berlin
+    - cron: "0 7 * * *"
+
   workflow_dispatch:
 
 permissions:
@@ -19,43 +20,79 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Berlin saatini kontrol et
+        id: saat_kontrol
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "calistir=true" >> "$GITHUB_OUTPUT"
+            echo "Manuel çalıştırma: workflow devam ediyor."
+            exit 0
+          fi
+
+          BERLIN_ZAMANI=$(TZ=Europe/Berlin date '+%Y-%m-%d %H:%M:%S')
+          BERLIN_SAATI=$(TZ=Europe/Berlin date '+%H')
+
+          echo "Berlin zamanı: $BERLIN_ZAMANI"
+
+          if [ "$BERLIN_SAATI" = "09" ]; then
+            echo "calistir=true" >> "$GITHUB_OUTPUT"
+            echo "Berlin saati 09:00, workflow devam ediyor."
+          else
+            echo "calistir=false" >> "$GITHUB_OUTPUT"
+            echo "Berlin saati 09 değil, workflow durduruluyor."
+          fi
+
       - name: Python kurulumu
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Bağımlılıkları yükle
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install playwright anthropic python-dotenv requests
           playwright install --with-deps chromium
 
       - name: Git ayarları
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
 
       - name: İçerik üret
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python icerik_uret.py
 
       - name: Görsel üret
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         run: |
           python gorsel_uret.py
 
       - name: Oluşturulan dosyaları GitHub'a kaydet
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         run: |
-          git add kullanilan_konular.json cikti/ gorseller/
-          git diff --cached --quiet || git commit -m "carousel: $(date +%Y-%m-%d-%H-%M-%S)"
-          git push
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "Kaydedilecek değişiklik yok."
+          else
+            git commit -m "carousel: $(date -u +%Y-%m-%d-%H-%M-%S)"
+            git push
+          fi
 
       - name: Görsellerin erişilebilir olmasını bekle
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         run: |
-          sleep 15
+          sleep 30
 
       - name: Carousel yayınla
+        if: steps.saat_kontrol.outputs.calistir == 'true'
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
