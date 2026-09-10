@@ -1,9 +1,11 @@
-name: 20:00 Story Yayını
+name: 18:00 UTC Story Yayını
 
 on:
   schedule:
-    - cron: "0 20 * * *"
-      timezone: "Europe/Berlin"
+    # Her gün 18:00 UTC
+    - cron: "0 18 * * *"
+
+  # Manuel çalıştırma
   workflow_dispatch:
 
 permissions:
@@ -14,10 +16,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Depoyu indir
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: UTC saatini göster
+        run: |
+          echo "=== GitHub UTC Saati ==="
+          date -u '+%Y-%m-%d %H:%M:%S UTC'
+          echo "Workflow tetikleyicisi: ${{ github.event_name }}"
 
       - name: Python kurulumu
         uses: actions/setup-python@v5
@@ -47,8 +56,13 @@ jobs:
       - name: Story dosyalarını GitHub'a kaydet
         run: |
           git add kullanilan_konular.json cikti/ stories/
-          git diff --cached --quiet || git commit -m "story: $(date +%Y-%m-%d-%H-%M-%S)"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "Kaydedilecek değişiklik yok."
+          else
+            git commit -m "story: $(date -u +%Y-%m-%d-%H-%M-%S)"
+            git push origin main
+          fi
 
       - name: GitHub CDN güncellemesini bekle
         run: |
