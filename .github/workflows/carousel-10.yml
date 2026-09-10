@@ -2,9 +2,12 @@ name: 09:00 Carousel Yayını
 
 on:
   schedule:
-    # TEST: 08:45 UTC = 10:45 Berlin (yaz saati)
-    - cron: "05 9 * * *"
+    # Her gün 09:00 Berlin saati
+    # Yaz/kış saati otomatik olarak Europe/Berlin tarafından yönetilir
+    - cron: "15 9 * * *"
+      timezone: "Europe/Berlin"
 
+  # Manuel çalıştırma
   workflow_dispatch:
 
 permissions:
