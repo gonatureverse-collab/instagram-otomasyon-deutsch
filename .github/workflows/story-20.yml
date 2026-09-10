@@ -3,9 +3,9 @@ name: 18:00 UTC Story Yayını
 on:
   schedule:
     # Her gün 18:00 UTC
+    # Almanya: kışın 19:00, yazın 20:00
     - cron: "0 18 * * *"
 
-  # Manuel çalıştırma
   workflow_dispatch:
 
 permissions:
@@ -16,9 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Depoyu indir
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -29,7 +28,7 @@ jobs:
           echo "Workflow tetikleyicisi: ${{ github.event_name }}"
 
       - name: Python kurulumu
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -66,7 +65,7 @@ jobs:
 
       - name: GitHub CDN güncellemesini bekle
         run: |
-          sleep 15
+          sleep 60
 
       - name: Story yayınla
         env:
