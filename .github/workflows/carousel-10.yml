@@ -4,7 +4,7 @@ on:
   schedule:
     # Her gün 09:00 Berlin saati
     # Yaz/kış saati otomatik olarak Europe/Berlin tarafından yönetilir
-    - cron: "15 9 * * *"
+    - cron: "15 11 * * *"
       timezone: "Europe/Berlin"
 
   # Manuel çalıştırma
