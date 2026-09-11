@@ -1,9 +1,9 @@
-name: 06:00 UTC Carousel Yayını
+name: 08:00 UTC Carousel Yayını
 
 on:
   schedule:
-    # Her gün 06:00 UTC
-    - cron: "0 6 * * *"
+    # Her gün 08:00 UTC
+    - cron: "0 2 * * *"
 
   # Manuel çalıştırma
   workflow_dispatch:
