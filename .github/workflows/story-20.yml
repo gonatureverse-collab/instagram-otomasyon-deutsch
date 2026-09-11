@@ -1,10 +1,10 @@
-name: 18:00 UTC Story Yayını
+name: 19:00 UTC Story Yayını
 
 on:
   schedule:
-    # Her gün 18:00 UTC
+    # Her gün 19:00 UTC
     # Almanya: kışın 19:00, yazın 20:00
-    - cron: "0 18 * * *"
+    - cron: "0 13 * * *"
 
   workflow_dispatch:
 
