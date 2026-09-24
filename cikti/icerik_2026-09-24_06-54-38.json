@@ -1,0 +1,54 @@
+{
+  "baslik": "⚠️ Jobbetrug in Deutschland erkennen",
+  "kapak_emoji": "🇩🇪",
+  "slaytlar": [
+    "Vorsicht vor Jobbetrügern! Lerne, wie du unseriöse Jobangebote erkennst und dich schützt.",
+    "Rote Flagge: Jobcenter und Arbeitsagentur verlangen NIEMALS Gebühren für Job-Vermittlung. Das ist kostenlos! 🚩",
+    "Seriöse Arbeitgeber kontaktieren dich über offizielle E-Mail-Adressen oder Telefon. Whatsapp-Nachrichten von unbekannten Nummern sind verdächtig. 📱",
+    "Vorsicht vor Vorkassen! Du sollst NIEMALS Geld für Bewerbungsunterlagen, Schulungen oder Ausrüstung bezahlen. ⛔",
+    "Zu schön um wahr zu sein? Unrealistische Gehälter bei einfachen Jobs deuten oft auf Betrug hin. Vertrau deinem Bauchgefühl! 🔍",
+    "Im Zweifelsfall frag die Arbeitsagentur oder einen Freund. Niemand wird dir böse sein, wenn du vorsichtig bist! ✅"
+  ],
+  "emojiler": [
+    "🚩",
+    "📱",
+    "⛔",
+    "🔍",
+    "✅"
+  ],
+  "reel": {
+    "baslik": "Jobbetrug in 20 Sekunden erkennen",
+    "sahneler": [
+      "Szene 1: Person schaut auf Handy, erhält Jobangebot – sieht glücklich aus",
+      "Szene 2: Text-Overlay: 'STOPP! Seriös oder Betrug?'",
+      "Szene 3: Schnelle Schnitte: Kostenlos-Versprechen, E-Mail mit Firmenlogo, Vorkasse-Forderung",
+      "Szene 4: Person schüttelt den Kopf bei verdächtigem Angebot",
+      "Szene 5: Text-Overlay: 'Das Arbeitsamt hilft KOSTENLOS'",
+      "Szene 6: Person ruft bei der Arbeitsagentur an, lächelt erleichtert"
+    ],
+    "cta": "Speichert euch diese Tipps! Bei Fragen fragt eure Arbeitsagentur oder einen vertrauten Freund. 👍"
+  },
+  "story": {
+    "baslik": "Quiz: Jobbetrug erkennen",
+    "metin": "Ein Arbeitgeber fordert 50 Euro für deine Bewerbungsunterlagen. Ist das normal in Deutschland?",
+    "anket": [
+      "Nein, das ist verdächtig",
+      "Ja, das ist normal"
+    ]
+  },
+  "caption": "Jobsuche kann stressig sein – aber niemals solltest du dafür Geld bezahlen! 🇩🇪 Echte Arbeitgeber in Deutschland verlangen keine Vorkassen. Wenn etwas komisch klingt, ist es wahrscheinlich auch komisch. Speichert euch diese Tipps und teilt sie mit Freunden, die nach Jobs suchen! Habt ihr Fragen? Schreibt uns! 👇",
+  "hashtagler": [
+    "#JobbetruginDeutschland",
+    "#WieMachtManDas",
+    "#JobsuchwerkstattDeutschland",
+    "#ArbeitsinDeutschland",
+    "#SicherJobsuche",
+    "#Arbeitsagentur",
+    "#DeutschlandTipp",
+    "#VorsichtBetrug",
+    "#NeueimDeutschland",
+    "#JobSchutz"
+  ],
+  "konu": "Wie man in Deutschland Jobbetrug erkennt",
+  "tarih": "2026-09-24_06-54-38"
+}
