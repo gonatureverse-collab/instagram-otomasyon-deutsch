@@ -1,0 +1,53 @@
+{
+  "baslik": "eID aktivieren in Deutschland – So geht's!",
+  "kapak_emoji": "🇩🇪",
+  "slaytlar": [
+    "Die eID ist deine digitale Identität in Deutschland. Mit ihr kannst du online behördliche Dinge regeln – ganz einfach von zu Hause.",
+    "Du brauchst einen gültigen Personalausweis oder Reisepass mit eID-Funktion. Überprüfe, ob dein Dokument das Zeichen hat.",
+    "Installiere die \"AusweisApp2\" kostenlos auf dein Handy oder Computer. Du findest sie im App-Store oder auf www.ausweisapp.bund.de.",
+    "Öffne die App und folge den Schritten. Du gibst deine PIN ein und scanst deinen Ausweis mit der Kamera.",
+    "Fertig! Deine eID ist aktiviert. Du kannst sie jetzt bei vielen Online-Diensten nutzen – bei Banken, Behörden und mehr."
+  ],
+  "emojiler": [
+    "📱",
+    "📄",
+    "⬇️",
+    "🔐",
+    "✅"
+  ],
+  "reel": {
+    "baslik": "eID aktivieren – schnell erklärt",
+    "sahneler": [
+      "\"Wie aktiviere ich meine eID?\" – Eine Frage, die viele Deutsche stellen.",
+      "Schritt 1: Hol dir die AusweisApp2 auf dein Handy.",
+      "Schritt 2: Öffne die App und folge den einfachen Anweisungen.",
+      "Schritt 3: Dein Personalausweis muss eID-fähig sein – schau auf das kleine Symbol.",
+      "Schritt 4: PIN eingeben, Ausweis scannen, fertig!",
+      "Speichern, teilen und schreib uns: Wie hat es bei dir geklappt?"
+    ],
+    "cta": "Speichern und direkt ausprobieren! Schreib in die Kommentare: Hat es funktioniert?"
+  },
+  "story": {
+    "baslik": "Kennst du die eID?",
+    "metin": "Hast du deine eID schon aktiviert oder nutzt du sie bereits?",
+    "anket": [
+      "Ja, ich nutze sie schon",
+      "Nein, noch nicht aktiviert"
+    ]
+  },
+  "caption": "Die eID macht dein Leben in Deutschland einfacher! 🇩🇪 Mit wenigen Klicks aktivierst du deine digitale Identität und kannst online Behördengänge erledigen. Speicher dir diesen Beitrag und teil ihn mit Freunden, die neu in Deutschland sind. Fragen? Schreib einen Kommentar! 💬",
+  "hashtagler": [
+    "#eID",
+    "#DeutschlandTipps",
+    "#WieMachtManDasinDeutschland",
+    "#DigitaleIdentität",
+    "#AusweisApp",
+    "#BehördengängeOnline",
+    "#DeutschlandInfo",
+    "#NeueInDeutschland",
+    "#DeutscheDigitalität",
+    "#EinfachErklärthalt"
+  ],
+  "konu": "Wie man in Deutschland die eID aktiviert",
+  "tarih": "2026-09-28_07-53-48"
+}
