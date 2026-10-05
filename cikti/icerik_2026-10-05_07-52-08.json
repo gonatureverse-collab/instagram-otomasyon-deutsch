@@ -1,0 +1,54 @@
+{
+  "baslik": "Gesundheitsversorgung in Deutschland für Ausländer",
+  "kapak_emoji": "🏥",
+  "slaytlar": [
+    "Du brauchst ärztliche Hilfe in Deutschland? Hier erfährst du, wie es funktioniert! 🏥",
+    "Schritt 1: Krankenversicherung abschließen. Das ist in Deutschland Pflicht. Frag bei deiner Arbeitsstelle oder bei einer Krankenkasse nach. 📄",
+    "Schritt 2: Hausarzt wählen. Melde dich bei einem Hausarzt in deiner Nähe an. Er ist dein erster Ansprechpartner. 👨‍⚕️",
+    "Schritt 3: Versichertenkarte abholen. Mit dieser Karte kannst du zum Arzt gehen. Du bekommst sie von deiner Krankenkasse. 🎫",
+    "Schritt 4: Arzttermin vereinbaren. Ruf an oder nutze online-Portale wie Doctolib oder Jameda. 📞",
+    "Wichtig: Informier dich bei deiner Krankenkasse über aktuelle Regelungen. Die Anforderungen können sich ändern. ✓"
+  ],
+  "emojiler": [
+    "📄",
+    "👨‍⚕️",
+    "🎫",
+    "📞",
+    "✓"
+  ],
+  "reel": {
+    "baslik": "Arzt in Deutschland - So geht es!",
+    "sahneler": [
+      "Du bist neu in Deutschland und brauchst einen Arzt? Das ist völlig normal und einfacher als du denkst!",
+      "Erste Frage: Hast du eine Krankenversicherung? Das ist der wichtigste Schritt.",
+      "Mit deiner Versichertenkarte gehst du zu einem Hausarzt oder einer Hausärztin in deiner Nähe.",
+      "Du kannst online einen Termin buchen - Apps wie Doctolib machen es super einfach.",
+      "Am Arzt fragst du einfach, ob du Hilfe brauchst - viele sprechen Englisch oder andere Sprachen.",
+      "Speichern nicht vergessen: Diese Tipps helfen dir und deinen Freunden! 💙"
+    ],
+    "cta": "Speichern und bei Bedarf deinen Freunden zeigen!"
+  },
+  "story": {
+    "baslik": "Schnelle Frage!",
+    "metin": "Wusstest du, dass eine Krankenversicherung in Deutschland gesetzlich vorgeschrieben ist?",
+    "anket": [
+      "Ja, das wusste ich",
+      "Nein, das wusste ich nicht"
+    ]
+  },
+  "caption": "Du brauchst ärztliche Hilfe in Deutschland? Keine Panik! Mit einer Krankenversicherung, einem Hausarzt und einer Versichertenkarte bist du gut versorgt. Für aktuelle Informationen kontaktiere deine Krankenkasse oder besuche die Seite deiner Stadt. Speichern und teilen! 💙",
+  "hashtagler": [
+    "#WieMachtManDasDeutschland",
+    "#AusländerInDeutschland",
+    "#Gesundheitsversorgung",
+    "#Krankenversicherung",
+    "#ArzBesuchen",
+    "#DeutschlandTipp",
+    "#NeuInDeutschland",
+    "#PraktischeTipps",
+    "#Integration",
+    "#Deutschland"
+  ],
+  "konu": "Wie man in Deutschland als Ausländer Gesundheitsversorgung nutzt",
+  "tarih": "2026-10-05_07-52-08"
+}
